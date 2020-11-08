@@ -1,0 +1,26 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+MACHINE_NAME = 'kali'.freeze
+
+Vagrant.configure(2) do |config|
+  config.vm.box = 'kalilinux/rolling'
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.network :private_network, auto_network: true
+  config.vm.hostname = MACHINE_NAME
+  config.vm.network 'public_network', type: 'dhcp', bridge: 'enp0s31f6'
+
+  config.vm.provider 'virtualbox' do |v|
+    v.gui = true
+    v.name = MACHINE_NAME
+    v.cpus = 1
+    v.memory = 4096
+    v.linked_clone = false
+    config.vm.box_check_update = false
+    v.check_guest_additions = true
+  end
+
+  config.vm.provision 'shell', inline: <<-SHELL
+    sudo hostname
+  SHELL
+end

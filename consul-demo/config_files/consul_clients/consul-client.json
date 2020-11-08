@@ -1,0 +1,11 @@
+{
+  "server": false,
+  "datacenter": "dc1",
+  "data_dir": "/tmp/consul",
+  "encrypt": "Luj2FZWwlt8475wD1WtwUQ==",
+  "log_level": "INFO",
+  "enable_syslog": true,
+  "leave_on_terminate": true,
+  "start_join": ["n1", "n2", "n3"],
+  "recursors": ["8.8.8.8", "4.2.2.2"]
+}

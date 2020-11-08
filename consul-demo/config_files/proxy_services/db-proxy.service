@@ -1,0 +1,20 @@
+[Unit]
+Description = 'HashiCorp Consul - DB Proxy'
+Documentation = https://www.consul.io/
+Requires = network-online.target
+After = network-online.target
+ConditionFileNotEmpty = /etc/consul.d/db.json
+
+[Service]
+Type = simple
+User = root
+Group = root
+ExecStart = /usr/local/bin/consul connect proxy -sidecar-for db
+ExecReload = /usr/local/bin/consul reload
+ExecStop = /usr/local/bin/consul leave
+KillMode = process
+Restart = on-failure
+LimitNOFILE = 65536
+
+[Install]
+WantedBy = multi-user.target
