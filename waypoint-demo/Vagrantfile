@@ -1,0 +1,38 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+MACHINE_NAME = 'waypoint'.freeze
+
+Vagrant.configure(2) do |config|
+  config.vm.box = 'generic/ubuntu1804'
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.network :private_network, auto_network: true
+  config.vm.hostname = MACHINE_NAME
+  config.vm.network 'private_network', ip: '172.20.20.10'
+  config.vm.provision 'file', source: './config_files/waypoint.service', destination: '/tmp/waypoint.service'
+
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.hostmanager.manage_guest = true
+  config.hostmanager.ignore_private_ip = false
+  config.hostmanager.include_offline = true
+
+  config.vm.provider 'virtualbox' do |v|
+    v.gui = false
+    v.name = MACHINE_NAME
+    v.cpus = 1
+    v.memory = 4096
+    v.linked_clone = false
+    config.vm.box_check_update = false
+    v.check_guest_additions = true
+  end
+
+  config.vm.provision 'shell', inline: <<-SHELL
+    curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+    sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+    sudo apt-get update && sudo apt-get install waypoint
+    waypoint -autocomplete-install
+    sudo mv /tmp/waypoint.service /etc/systemd/system
+    sudo systemctl enable waypoint.service && sudo systemctl start waypoint.service
+  SHELL
+end

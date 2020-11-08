@@ -1,0 +1,34 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure('2') do |config|
+  config.vm.provision 'file', source: './files/replicated.conf', destination: '/home/vagrant/replicated.conf'
+  config.vm.provision 'file', source: './files/settings.json', destination: '/home/vagrant/settings.json'
+  config.vm.provision 'file', source: './files/gen-cert.sh', destination: '/home/vagrant/gen-cert.sh'
+  config.vm.provision 'file', source: './files/license.rli', destination: '/home/vagrant/license.rli'
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  # PTFE server
+  config.vm.define 'ptfe', autostart: true do |s|
+    s.ssh.insert_key = false
+    s.vm.box = 'generic/ubuntu1804'
+    s.vm.box_check_update = false
+    s.vm.hostname = 'ptfe.vagrant.local'
+    s.vm.network 'private_network', ip: '10.0.0.71'
+    s.vm.provider 'virtualbox' do |vb|
+      vb.gui = false
+      vb.cpus = 2
+      vb.memory = 4096
+    end
+    s.vm.provision 'shell', inline: <<-SHELL
+      apt-get update
+      DEBIAN_FRONTEND=noninteractive apt-get upgrade -y --auto-remove
+      mv /home/vagrant/replicated.conf /etc
+      mv /home/vagrant/settings.json /etc
+      chmod +x /home/vagrant/gen-cert.sh && /home/vagrant/gen-cert.sh ptfe.vagrant.local >/dev/null 2>/dev/null
+      curl -o /home/vagrant/install.sh https://install.terraform.io/ptfe/stable
+      bash /home/vagrant/install.sh no-proxy private-address=10.0.0.71 public-address=10.0.0.71
+      echo ''
+      echo 'https://ptfe.vagrant.local:8800/dashboard'
+    SHELL
+  end
+end

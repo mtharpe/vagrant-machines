@@ -1,0 +1,52 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = '2'.freeze
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = 'generic/ubuntu1804'
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.hostmanager.manage_guest = true
+  config.hostmanager.ignore_private_ip = false
+  config.hostmanager.include_offline = true
+  config.vm.provision 'shell', path: './scripts/install-nomad.sh'
+  config.vm.provider 'virtualbox' do |v|
+    v.gui = false
+    v.cpus = 1
+    v.memory = 3000
+    v.linked_clone = false
+    config.vm.box_check_update = false
+    v.check_guest_additions = true
+  end
+
+  config.vm.define 'n1' do |n1|
+    n1.vm.hostname = 'n1'
+    n1.vm.network 'private_network', ip: '172.20.20.100'
+    n1.vm.provision 'file', source: './config_files/nomad.service', destination: '/tmp/nomad.service'
+    n1.vm.provision 'file', source: './config_files/nomad.hcl', destination: '/tmp/nomad.hcl'
+    n1.vm.provision 'shell', inline: 'sudo mv /tmp/nomad.service /etc/systemd/system && sudo mv /tmp/nomad.hcl /etc/nomad.d'
+    n1.vm.provision 'shell', path: './scripts/server-install.sh'
+    # n1.vm.provision 'shell', inline: 'sudo reboot now'
+  end
+
+  config.vm.define 'n2' do |n2|
+    n2.vm.hostname = 'n2'
+    n2.vm.network 'private_network', ip: '172.20.20.101'
+    n2.vm.provision 'file', source: './config_files/nomad.service', destination: '/tmp/nomad.service'
+    n2.vm.provision 'file', source: './config_files/nomad.hcl', destination: '/tmp/nomad.hcl'
+    n2.vm.provision 'shell', inline: 'sudo mv /tmp/nomad.service /etc/systemd/system && sudo mv /tmp/nomad.hcl /etc/nomad.d'
+    n2.vm.provision 'shell', path: './scripts/server-install.sh'
+    # n2.vm.provision 'shell', inline: 'sudo reboot now'
+  end
+
+  config.vm.define 'n3' do |n3|
+    n3.vm.hostname = 'n3'
+    n3.vm.network 'private_network', ip: '172.20.20.102'
+    n3.vm.provision 'file', source: './config_files/nomad.service', destination: '/tmp/nomad.service'
+    n3.vm.provision 'file', source: './config_files/nomad.hcl', destination: '/tmp/nomad.hcl'
+    n3.vm.provision 'shell', inline: 'sudo mv /tmp/nomad.service /etc/systemd/system && sudo mv /tmp/nomad.hcl /etc/nomad.d'
+    n3.vm.provision 'shell', path: './scripts/server-install.sh'
+    # n3.vm.provision 'shell', inline: 'sudo reboot now'
+  end
+end

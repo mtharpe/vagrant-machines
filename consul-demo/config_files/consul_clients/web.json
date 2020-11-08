@@ -1,0 +1,24 @@
+{
+  "service": {
+    "name": "web",
+    "tags": ["apache2"],
+    "port": 80,
+    "connect": {
+      "sidecar_service": {
+        "proxy": {
+          "upstreams": [
+            {
+              "destination_name": "db",
+              "local_bind_port": 3306
+            }
+          ]
+        }
+      }
+    },
+    "check": {
+      "name": "web_check",
+      "args": ["lsof", "-i:80"],
+      "interval": "5s"
+    }
+  }
+}

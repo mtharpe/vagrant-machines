@@ -1,0 +1,28 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+MACHINE_NAME = 'fedora-workstation'.freeze
+
+Vagrant.configure(2) do |config|
+  config.vm.box = 'generic/fedora32'
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.network :private_network, auto_network: true
+  config.vm.hostname = MACHINE_NAME
+  config.vm.network 'private_network', type: 'dhcp'
+
+  config.vm.provider 'virtualbox' do |v|
+    v.gui = true
+    v.name = MACHINE_NAME
+    v.cpus = 2
+    v.memory = 4096
+    v.linked_clone = false
+    config.vm.box_check_update = false
+    v.check_guest_additions = true
+  end
+
+  config.vm.provision 'shell', inline: <<-SHELL
+    sudo dnf upgrade -y
+    sudo dnf install wget curl git dnf-automatic -y
+    sudo dnf groupinstall "Fedora Workstation" -y --allowerasing
+  SHELL
+end

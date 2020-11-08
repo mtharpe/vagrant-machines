@@ -1,0 +1,34 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+MACHINE_NAME = 'template-vm'.freeze
+
+Vagrant.configure(2) do |config|
+  config.vm.box = 'generic/template-vm'
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.network :private_network, auto_network: true
+  config.vm.hostname = MACHINE_NAME
+  # config.vm.network "forwarded_port", guest: 9090, host: 9090
+  config.vm.network 'private_network', type: 'dhcp'
+  config.vm.network 'public_network', type: 'dhcp', bridge: 'enp0s31f6'
+
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.hostmanager.manage_guest = true
+  config.hostmanager.ignore_private_ip = false
+  config.hostmanager.include_offline = true
+
+  config.vm.provider 'virtualbox' do |v|
+    v.gui = false
+    v.name = MACHINE_NAME
+    v.cpus = 1
+    v.memory = 4096
+    v.linked_clone = false
+    config.vm.box_check_update = false
+    v.check_guest_additions = true
+  end
+
+  config.vm.provision 'shell', inline: <<-SHELL
+    sudo hostname
+  SHELL
+end
