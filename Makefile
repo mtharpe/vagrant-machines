@@ -2,7 +2,8 @@ LIST = centos7 centos8 rhel7 rhel8 ubuntu1604 ubuntu1804 ubuntu2004 fedora32 fed
 targets = $(addprefix generic/, $(LIST))
 hypervisor = virtualbox
 installed := $(vagrant box list)
-name = invalid-name
+name = no-name
+box = ubuntu1804
 
 install:
 	@for box in $(targets); do \
@@ -22,4 +23,6 @@ clean:
 	@vagrant box prune
 
 vm:
-	@cp -R ./template-vm ./$(name)
+	@cp -R ./template-vm ./$(name) 
+	@sed -i '' 's/template-vm/$(name)/g' ./$(name)/Vagrantfile
+	@sed -i '' 's/generic\/$(name)/generic\/$(box)/g' ./$(name)/Vagrantfile
