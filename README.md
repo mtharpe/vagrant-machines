@@ -13,6 +13,8 @@ You will need to install some things before you can use the Vagrant machines in 
 
 Next, you can use the `Makefile` included in the repo to install, update, validate, and prune the machines.
 
+All boxes are derived from https://roboxes.org/ and have a prefix of ```generic``` based on the names, and so when you are creating new Vm's it is assumed that you are using this repo for the creation.
+
 Example:
 
 ```
@@ -21,11 +23,13 @@ make install
 make update
 make validate
 make clean
+make vm name=<mahine-name> box=<somebox>
 ```
 
 ## Examples
 
 ```
+$ make vm name=centos-7 box=centos7
 $ cd centos-7
 $ vagrant up
 ```
