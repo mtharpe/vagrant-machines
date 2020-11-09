@@ -2,8 +2,16 @@ LIST = centos7 centos8 rhel7 rhel8 ubuntu1604 ubuntu1804 ubuntu2004 fedora32 fed
 targets = $(addprefix generic/, $(LIST))
 hypervisor = virtualbox
 installed := $(vagrant box list)
-name = no-name
-box = ubuntu1804
+name = 
+box = 
+
+check-variables:
+ifndef name
+  $(error name is undefined)
+endif
+ifndef box
+  $(error box is undefined)
+endif
 
 install:
 	@for box in $(targets); do \
@@ -22,7 +30,7 @@ plugins:
 clean:
 	@vagrant box prune
 
-vm:
+vm: check-variables
 	@cp -R ./template-vm ./$(name) 
 	@sed -i '' 's/template-vm/$(name)/g' ./$(name)/Vagrantfile
 	@sed -i '' 's/generic\/$(name)/generic\/$(box)/g' ./$(name)/Vagrantfile
