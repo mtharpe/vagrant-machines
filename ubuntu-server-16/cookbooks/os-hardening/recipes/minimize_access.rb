@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name: os-hardening
+# Cookbook:: Name: os-hardening
 # Recipe: minimize_access
 #
-# Copyright 2014, Deutsche Telekom AG
+# Copyright:: 2014, Deutsche Telekom AG
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 
 # remove write permissions from path folders ($PATH) for all regular users
 # this prevents changing any system-wide command from normal users
-paths = %w[/usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin] + node['os-hardening']['env']['extra_user_paths']
+paths = %w(/usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin) + node['os-hardening']['env']['extra_user_paths']
 paths.each do |folder|
   execute "remove write permission from #{folder}" do
     command "chmod go-w -R #{folder}"
@@ -58,7 +58,7 @@ end
 directory '/var/log' do
   owner 'root'
   # ubuntu with containers does not have rsyslog installed and syslog group does not exist
-  if node['platform'] == 'ubuntu' && node['packages']['rsyslog']
+  if platform?('ubuntu') && node['packages']['rsyslog']
     group 'syslog'
   else
     group 'root'

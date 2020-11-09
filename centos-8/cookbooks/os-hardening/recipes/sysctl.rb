@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name: os-hardening
+# Cookbook:: Name: os-hardening
 # Recipe: sysctl
 #
-# Copyright 2012, Dominik Richter
-# Copyright 2014, Deutsche Telekom AG
+# Copyright:: 2012, Dominik Richter
+# Copyright:: 2014, Deutsche Telekom AG
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 # limitations under the License.
 #
 
-::Chef::Recipe.send(:include, SysctlCookbook::SysctlHelpers::Param)
+::Chef::DSL::Recipe.include SysctlCookbook::SysctlHelpers::Param
 
 # cleanup of old sysctl related configurations. This can be removed at some point in the future
 # https://github.com/dev-sec/chef-os-hardening/issues/166#issuecomment-322433264
@@ -157,8 +157,7 @@ end
 
 # NSA 2.2.4.1 Set Daemon umask
 # do config for rhel-family
-case node['platform_family']
-when 'rhel', 'fedora', 'amazon'
+if platform_family?('rhel', 'fedora', 'amazon')
   template '/etc/sysconfig/init' do
     source 'rhel_sysconfig_init.erb'
     mode '0544'
@@ -173,8 +172,7 @@ when 'rhel', 'fedora', 'amazon'
 end
 
 # do initramfs config for ubuntu and debian
-case node['platform_family']
-when 'debian'
+if platform_family?('debian')
 
   # rebuild initramfs with starting pack of modules,
   # if module loading at runtime is disabled
