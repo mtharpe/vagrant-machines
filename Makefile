@@ -1,4 +1,4 @@
-LIST = centos7 centos8 rhel7 rhel8 ubuntu1604 ubuntu1804 ubuntu2004 fedora32 fedora33 
+LIST = centos6 centos7 centos8 rhel6 rhel7 rhel8 ubuntu1604 ubuntu1804 ubuntu2004 fedora32 fedora33 
 targets = $(addprefix generic/, $(LIST))
 hypervisor = virtualbox
 installed := $(vagrant box list)
