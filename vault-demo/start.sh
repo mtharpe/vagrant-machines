@@ -28,7 +28,7 @@ echo -e "
 "
 echo -e "                                          
           *********************************************
-          | Vault Token: ${VAULT_TOKEN}   |
+            Vault Token: ${VAULT_TOKEN}
           |-------------------------------------------|
           | Servers:                                  |
           | v1:8200 - Primary Vault                   |
