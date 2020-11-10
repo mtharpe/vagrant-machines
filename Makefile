@@ -22,7 +22,9 @@ plugins:
 clean:
 	@vagrant box prune
 
-vm: check-variables
-	@cp -R ./template-vm ./$(name) 
-	@sed -i '' 's/template-vm/$(name)/g' ./$(name)/Vagrantfile
-	@sed -i '' 's/generic\/$(name)/generic\/$(box)/g' ./$(name)/Vagrantfile
+vm: 
+	@test -n "${name}" ## Please name your VM: name=somename
+	@test -n "${box}" ## Please specify your box: box=somebox
+	@cp -R ./template-vm ./$(name)
+	@sed -i 's/template-vm/$(name)/g' ./$(name)/Vagrantfile
+	@sed -i 's/generic\/$(name)/generic\/${box}/g' ./$(name)/Vagrantfile
