@@ -5,14 +5,6 @@ installed := $(vagrant box list)
 name = 
 box = 
 
-check-variables:
-ifndef name
-  $(error name is undefined)
-endif
-ifndef box
-  $(error box is undefined)
-endif
-
 install:
 	@for box in $(targets); do \
 		printf "\nInstalling $$box\n" && vagrant box add $$box --provider=$(hypervisor); done
