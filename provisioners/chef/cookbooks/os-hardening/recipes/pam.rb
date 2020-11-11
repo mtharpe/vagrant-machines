@@ -74,6 +74,7 @@ when 'debian'
 
   # configure tally2
   if node['os-hardening']['auth']['retries'] > 0
+
     # tally2 is needed for pam
     package 'libpam-modules'
 

@@ -40,7 +40,9 @@ module DevSec
     # Fallback ssh version for autodetection
     FALLBACK_SSH_VERSION ||= 5.9
     # Support types of ssh
+
     SSH_TYPES ||= %i(client server).freeze
+
     # Crypto configuration for different ssh parameters
     CRYPTO ||= {
       kexs: {

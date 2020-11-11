@@ -20,7 +20,6 @@ maintainer_email 'dominik.richter@googlemail.com'
 license          'Apache-2.0'
 description      'This cookbook installs and provides secure ssh and sshd configurations.'
 version          '2.9.0'
-
 chef_version '>= 12.5'
 
 supports 'ubuntu', '>= 12.04'
@@ -33,6 +32,10 @@ supports 'suse'
 supports 'opensuse', '>= 13.2'
 supports 'opensuseleap', '>= 42.1'
 supports 'amazon'
+
+recipe 'ssh-hardening::default', 'installs and configures ssh client and server'
+recipe 'ssh-hardening::client', 'install and apply security hardening for ssh client'
+recipe 'ssh-hardening::server', 'install and apply security hardening for ssh server'
 
 source_url 'https://github.com/dev-sec/chef-ssh-hardening'
 issues_url 'https://github.com/dev-sec/chef-ssh-hardening/issues'

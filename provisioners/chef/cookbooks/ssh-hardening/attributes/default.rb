@@ -30,6 +30,7 @@ else
 end
 
 # Define the package name for selinux utils
+
 if platform_family?('fedora') || # rubocop:disable Style/ConditionalAssignment
    platform_family?('rhel') && node['platform_version'].to_f >= 8
   default['ssh-hardening']['selinux']['package'] = 'policycoreutils-python-utils'
@@ -67,6 +68,7 @@ default['ssh-hardening']['ssh']['client'].tap do |client|
   client['allow_agent_forwarding'] = false
   client['remote_hosts'] = []
   client['password_authentication'] = false # ssh
+
   # http://undeadly.org/cgi?action=article&sid=20160114142733
   client['roaming']       = false
   client['send_env']      = ['LANG', 'LC_*', 'LANGUAGE']
