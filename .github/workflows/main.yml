@@ -24,7 +24,10 @@ jobs:
 
     # Runs a single command using the runners shell
     - name: Install Vagrant
-      run: sudo apt-get update && sudo apt-get install virtualbox && curl -O https://releases.hashicorp.com/vagrant/2.2.6/vagrant_2.2.6_x86_64.deb && sudo apt install ./vagrant_2.2.6_x86_64.deb
+      run: sudo apt-get update && sudo apt-get install virtualbox build-essential && curl -O https://releases.hashicorp.com/vagrant/2.2.6/vagrant_2.2.6_x86_64.deb && sudo apt install ./vagrant_2.2.6_x86_64.deb
+
+    - name: Install Vagrant Plugins
+      run: make plugins
 
     # Runs a set of commands using the runners shell
     - name: Run validation
