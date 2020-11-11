@@ -1,10 +1,10 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-MACHINE_NAME = 'centos-7'.freeze
+MACHINE_NAME = 'centos-6'.freeze
 
 Vagrant.configure(2) do |config|
-  config.vm.box = 'generic/centos7'
+  config.vm.box = 'generic/centos6'
   config.vm.synced_folder '.', '/vagrant', disabled: true
   config.vm.network :private_network, auto_network: true
   config.vm.hostname = MACHINE_NAME
