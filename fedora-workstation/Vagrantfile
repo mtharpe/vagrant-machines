@@ -4,7 +4,7 @@
 MACHINE_NAME = 'fedora-workstation'.freeze
 
 # Config engine (Ansible or Chef)
-CONFIG_ENGINE = 'chef'.freeze
+CONFIG_ENGINE = 'ansible'.freeze
 
 # Ansible global controls
 ANSIBLE_PLAYBOOK = 'ansible-fedora-base'.freeze
