@@ -1,0 +1,31 @@
+---
+- name: Install the RPMForge Non-Free repo
+  yum_repository:
+    name: rpmfusion-non-free
+    description: RPMFusion Non-Free
+    mirrorlist: https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
+    enabled: yes
+    state: present
+
+- name: Install the RPMForge Free repo
+  yum_repository:
+    name: rpmfusion-free
+    description: RPMFusion Free
+    mirrorlist: https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
+    enabled: yes
+    state: present
+
+- name: Install the Google Chrome repo
+  yum_repository:
+    name: google-chrome-stable
+    description: Google Chrome Stable Repo
+    baseurl: http://dl.google.com/linux/chrome/rpm/stable/x86_64
+    gpgkey: https://dl.google.com/linux/linux_signing_key.pub
+    gpgcheck: yes
+    enabled: yes
+    state: present
+
+- name: Install HashiCorp repo
+  get_url:
+    url: https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
+    dest: /etc/yum.repos.d/hashicorp.repo
