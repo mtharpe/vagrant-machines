@@ -4,6 +4,7 @@
 - name: Install common workstation packages
   dnf:
     name:
+      - '@Fedora Workstation'
       - gnome-tweak-tool
       - ffmpeg
       - direnv
