@@ -43,7 +43,6 @@ Vagrant.configure(2) do |config|
     end
   elsif CONFIG_ENGINE == 'chef'
     config.vm.provision 'chef_zero' do |chef|
-      chef.version = '14.15.6'
       chef.arguments = '--chef-license accept'
       chef.cookbooks_path = './cookbooks'
       chef.nodes_path = './nodes'
