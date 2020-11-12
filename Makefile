@@ -27,4 +27,4 @@ vm:
 	test -n "${box}" ## Please specify your box: box=somebox
 	@cp -R ./template-vm ./$(name)
 	@sed -i 's/template-vm/$(name)/g' ./$(name)/Vagrantfile
-	@sed -i 's/generic\/$(name)/generic\/${box}/g' ./$(name)/Vagrantfile
+	@sed -i 's/generic\/$(name)/generic\/$(box)/g' ./$(name)/Vagrantfile
