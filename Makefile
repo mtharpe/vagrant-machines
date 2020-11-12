@@ -21,6 +21,7 @@ plugins:
 
 clean:
 	@vagrant box prune
+	@for i in `ls -d */`; do ( cd $i && make clean ); done
 
 vm: 
 	test -n "${name}" ## Please name your VM: name=somename
@@ -28,3 +29,6 @@ vm:
 	@cp -R ./template-vm ./$(name)
 	@sed -i 's/template-vm/$(name)/g' ./$(name)/Vagrantfile
 	@sed -i 's/generic\/$(name)/generic\/$(box)/g' ./$(name)/Vagrantfile
+	@ln -s ./provisioners/ansible ./$(name)/ansible
+	@ln -s ./provisioners/chef/cookbooks ./$(name)/cookbooks
+	@ln -s ./provisioners/chef/nodes ./$(name)/nodes
