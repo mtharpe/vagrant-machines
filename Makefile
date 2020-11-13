@@ -21,7 +21,7 @@ plugins:
 
 clean:
 	@vagrant box prune
-	@for i in `ls -d */`; do ( cd $i && make clean ); done
+	# @for i in `ls -d */`; do ( cd $i && make clean ) || true; done # this is just a command line reference
 
 vm: 
 	test -n "${name}" ## Please name your VM: name=somename
@@ -32,3 +32,6 @@ vm:
 	@ln -s ./provisioners/ansible ./$(name)/ansible
 	@ln -s ./provisioners/chef/cookbooks ./$(name)/cookbooks
 	@ln -s ./provisioners/chef/nodes ./$(name)/nodes
+
+links:
+	@for i in `ls -d */`; do ( cd $i && make links ) || true; done
