@@ -27,7 +27,7 @@ Vagrant.configure(2) do |config|
   config.hostmanager.include_offline = true
 
   config.vm.provider 'virtualbox' do |v|
-    v.gui = false
+    v.gui = true
     v.name = MACHINE_NAME
     v.cpus = 1
     v.memory = 4096
