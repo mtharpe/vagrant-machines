@@ -1,0 +1,25 @@
+---
+- name: Set Dark Theme
+  command: gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+  become_user: vagrant
+
+- name: Set Time Format
+  command: gsettings set org.gnome.desktop.interface clock-format 12h
+  become_user: vagrant
+
+- name: Disable Window Anamations
+  command: gsettings set org.gnome.desktop.interface enable-animations false
+  become_user: vagrant
+
+- name: Add Maximize Minimize and Close
+  command: gsettings set org.gnome.desktop.wm.preferences button-layout ":minimize,maximize,close"
+  become_user: vagrant
+
+- name: Get Termianl Profile Default Settings
+  command: gsettings get org.gnome.Terminal.ProfilesList default | awk -F \' '{print $2}'
+  register: term
+  become_user: vagrant
+
+- name: Set Termainal Font
+  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:term.stdout/ font 'Monospace 10'
+  become_user: vagrant
