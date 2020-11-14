@@ -16,10 +16,37 @@
   become_user: vagrant
 
 - name: Get Termianl Profile Default Settings
-  command: gsettings get org.gnome.Terminal.ProfilesList default | awk -F \' '{print $2}'
+  command: gsettings get org.gnome.Terminal.ProfilesList default #| awk -F \\' '{print $2}'
   register: term
   become_user: vagrant
 
+- debug:
+    msg: echo {{ term.stdout }}
+
 - name: Set Termainal Font
-  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:term.stdout/ font 'Monospace 10'
+  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ font 'Monospace 14'
+  become_user: vagrant
+
+- name: Set Terminal Disable System Font
+  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ use-system-font false
+  become_user: vagrant
+
+- name: Set Terminal Disable Bell Font
+  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ audible-bell false
+  become_user: vagrant
+
+- name: Set Terminal Disable Color Themes
+  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ use-theme-colors false
+  become_user: vagrant
+
+- name: Set Terminal BG Color
+  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ background-color '#000000'
+  become_user: vagrant
+
+- name: Set Terminal FG Color
+  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ foreground-color '#AFAFAF'
+  become_user: vagrant
+
+- name: Set Terminal Scrollbar Policy
+  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ scrollbar-policy never
   become_user: vagrant
