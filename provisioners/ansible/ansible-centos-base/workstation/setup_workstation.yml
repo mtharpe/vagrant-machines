@@ -4,5 +4,8 @@
   become: true
   gather_facts: true
 
+  vars:
+    - username: vagrant
+    
   tasks:
     - include_tasks: tasks/main.yml
