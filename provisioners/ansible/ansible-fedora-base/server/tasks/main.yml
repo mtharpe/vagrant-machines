@@ -4,8 +4,6 @@
 - name: Install Common Packages
   dnf:
     name:
-      - direnv
-      - vim
       - wget
       - unzip
       - curl
@@ -15,7 +13,5 @@
       - consul
       - nomad
       - waypoint
-      - vagrant
-      - VirtualBox
     disable_gpg_check: yes
     state: present
