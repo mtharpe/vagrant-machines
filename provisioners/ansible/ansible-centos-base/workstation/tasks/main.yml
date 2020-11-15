@@ -1,29 +1,11 @@
 ---
 - include_tasks: repo.yml
+- include_tasks: packages.yml
+- include_tasks: services.yml
+- include_tasks: gsettings.yml
 
-- name: Install common workstation packages
-  dnf:
-    name:
-      - gnome-tweak-tool
-      - ffmpeg
-      - direnv
-      - nmon
-      - tlp
-      - tlp-rdw
-      - vlc
-      - google-chrome-stable
-      - terraform
-      - vault
-      - consul
-      - nomad
-      - waypoint
-      - vagrant
-      - VirtualBox
-    disable_gpg_check: yes
-    state: present
+- name: Setting Graphical Target
+  shell: systemctl set-default graphical.target
 
-- name: Enable TLP
-  service:
-    name: tlp
-    enabled: yes
-    state: started
+- debug:
+    msg: "Please reboot this machine to enable Gnome"
