@@ -8,8 +8,8 @@ CONFIG_ENGINE = 'ansible'.freeze
 
 # Ansible global controls
 ANSIBLE_PLAYBOOK = 'ansible-centos-base'.freeze
-ANSIBLE_ROLE = 'workstation'.freeze
-ANSIBLE_SETUP_FILE = 'setup_workstation.yml'.freeze
+ANSIBLE_ROLE = 'server'.freeze
+ANSIBLE_SETUP_FILE = 'setup_server.yml'.freeze
 
 # Chef global controls
 CHEF_RECIPE = 'chef-linux-base-recipe'.freeze

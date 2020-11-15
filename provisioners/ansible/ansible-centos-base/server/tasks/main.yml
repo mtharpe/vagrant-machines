@@ -1,29 +1,17 @@
 ---
 - include_tasks: repo.yml
 
-- name: Install common workstation packages
+- name: Install Common Packages
   dnf:
     name:
-      - gnome-tweak-tool
-      - ffmpeg
-      - direnv
+      - wget
+      - unzip
+      - curl
       - nmon
-      - tlp
-      - tlp-rdw
-      - vlc
-      - google-chrome-stable
       - terraform
       - vault
       - consul
       - nomad
       - waypoint
-      - vagrant
-      - VirtualBox
     disable_gpg_check: yes
     state: present
-
-- name: Enable TLP
-  service:
-    name: tlp
-    enabled: yes
-    state: started
