@@ -1,10 +1,10 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-VAULT_DEMO_VERSION = '1.5.5'.freeze
+VAULT_DEMO_VERSION = '1.6.1'.freeze
 
 Vagrant.configure(2) do |config|
-  config.vm.box = 'generic/ubuntu1804'
+  config.vm.box = 'generic/ubuntu2004'
 
   config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
