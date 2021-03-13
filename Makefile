@@ -11,6 +11,7 @@ install:
 update:
 	@for box in $(targets); do \
 		printf "\nUpdating $$box\n" && vagrant box update --box $$box; done
+	@vagrant box prune
 
 validate:
 	@for box in $(shell ls -d */); do \
