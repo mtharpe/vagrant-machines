@@ -6,7 +6,7 @@
 #     state: present
 
 - name: Install common workstation packages
-  dnf:
+  yum:
     name:
       - "@Workstation"
       - "@Development Tools"
