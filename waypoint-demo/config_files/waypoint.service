@@ -1,9 +1,0 @@
-[Unit]
-Description="Wayland"
-
-[Service]
-Type=simple
-ExecStart=/usr/bin/waypoint server run -accept-tos -listen-http=172.20.20.10:9702
-
-[Install]
-WantedBy=multi-user.target
