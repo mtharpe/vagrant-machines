@@ -16,7 +16,7 @@ CHEF_RECIPE = 'chef-linux-base-recipe'.freeze
 
 Vagrant.configure(2) do |config|
   config.vm.box = 'generic/fedora33'
-  config.vm.synced_folder '.', '/vagrant', disabled: false
+  config.vm.synced_folder '.', '/vagrant', disabled: true
   config.vm.network :private_network, auto_network: true
   config.vm.hostname = MACHINE_NAME
 
