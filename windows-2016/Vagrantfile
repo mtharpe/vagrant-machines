@@ -1,6 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# Define Machine name
 MACHINE_NAME = 'windows-2016'.freeze
 
 # Config engine (Ansible or Chef)
