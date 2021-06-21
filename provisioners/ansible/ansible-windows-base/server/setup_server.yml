@@ -1,0 +1,7 @@
+---
+- name: Setup Workstation
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - include_tasks: tasks/main.yml

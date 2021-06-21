@@ -1,4 +1,3 @@
-
 links:
 	echo "Setting symlinks for provisioners"
 	@ln -s ../provisioners/ansible .
