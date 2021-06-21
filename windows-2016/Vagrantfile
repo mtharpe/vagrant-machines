@@ -15,7 +15,7 @@ ANSIBLE_SETUP_FILE = 'setup_server.yml'.freeze
 
 Vagrant.configure(2) do |config|
   config.vm.box = 'mwrock/Windows2016'
-  config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.synced_folder '.', '/vagrant', disabled: false
   config.vm.network :private_network, auto_network: true
   config.vm.hostname = MACHINE_NAME
   # config.vm.network 'forwarded_port', guest: 9090, host: 9090

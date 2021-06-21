@@ -1,0 +1,20 @@
+---
+- include_tasks: repo.yml
+
+- name: Install Common Packages
+  apt:
+    name:
+      - wget
+      - nmon
+      - direnv
+      - tmux
+      - unzip
+      - curl
+      - nmon
+      - terraform
+      - vault
+      - consul
+      - nomad
+      - waypoint
+    update_cache: yes
+    state: present
