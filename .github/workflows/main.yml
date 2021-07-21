@@ -6,9 +6,14 @@ name: Vagrant Validation
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
+      - main
+      - libvirt
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
+      - main
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -24,7 +29,7 @@ jobs:
 
     # Runs a single command using the runners shell
     - name: Install Vagrant
-      run: sudo apt-get update && sudo apt-get install virtualbox build-essential && curl -O https://releases.hashicorp.com/vagrant/2.2.6/vagrant_2.2.6_x86_64.deb && sudo apt install ./vagrant_2.2.6_x86_64.deb
+      run: sudo apt-get update && sudo apt-get install virtualbox build-essential && curl -O https://releases.hashicorp.com/vagrant/2.2.17/vagrant_2.2.17_x86_64.deb && sudo apt install ./vagrant_2.2.17_x86_64.deb
 
     - name: Install Vagrant Plugins
       run: make plugins
