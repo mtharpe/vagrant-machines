@@ -9,7 +9,7 @@ Vagrant is a tool for building and managing virtual machine environments in a si
 You will need to install some things before you can use the Vagrant machines in this repo. The software can be installed via package manager or standalone installs, but must be functional before these will work.
 
 - Vagrant
-- VirtualBox
+- libvirtd
 
 Next, you can use the `Makefile` included in the repo to install, update, validate, and prune the machines.
 
