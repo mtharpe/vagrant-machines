@@ -1,7 +1,7 @@
 Vagrant.require_version '>= 2.1.0'
 
 
-MACHINE_NAME = 'centos-8'.freeze
+MACHINE_NAME = 'redhat-8'.freeze
 
 # Config engine (Ansible or Chef)
 CONFIG_ENGINE = 'ansible'.freeze
@@ -10,9 +10,6 @@ CONFIG_ENGINE = 'ansible'.freeze
 ANSIBLE_PLAYBOOK = 'ansible-centos-base'.freeze
 ANSIBLE_ROLE = 'server'.freeze
 ANSIBLE_SETUP_FILE = 'setup_server.yml'.freeze
-
-# Chef global controls
-CHEF_RECIPE = 'chef-linux-base-recipe'.freeze
 
 user = ENV['RH_SUBSCRIPTION_MANAGER_USER']
 password = ENV['RH_SUBSCRIPTION_MANAGER_PW']
@@ -35,21 +32,32 @@ if subscription-manager status; then
 fi
 )
 
-Vagrant.configure('2') do |config|
-  config.vm.box = 'generic/rhel8'
-  config.vm.synced_folder '.', '/vagrant', disabled: true
-  config.vm.network :private_network, auto_network: true
+Vagrant.configure("2") do |config|
   config.vm.hostname = MACHINE_NAME
-
+  config.vm.box = "generic/rhel8"
+  config.vm.provider :libvirt do |domain|
+      domain.memory = 2048
+      domain.cpus = 1
+      domain.nested = true
+  # config.vm.network :private_network, :ip => '10.20.30.40'
+  # config.vm.network :public_network, :ip => '10.20.30.41'
   config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
   config.hostmanager.manage_guest = true
   config.hostmanager.ignore_private_ip = false
   config.hostmanager.include_offline = true
+  end
 
-  config.vm.provider 'virtualbox' do |vb|
-    vb.cpus = 2
-    vb.memory = '2048'
+  config.vm.provider :libvirt do |libvirt|
+    libvirt.driver = "kvm"
+    libvirt.storage_pool_name = "default"
+    libvirt.snapshot_pool_name = "default"
+    # libvirt.default_prefix = 'vagrant-'
+    # libvirt.qemu_use_session = true
+    # libvirt.host = "localhost"
+    # libvirt.connect_via_ssh = false
+    # libvirt.username = "root"
+    # libvirt.password = "secret"
   end
 
   config.vm.provision 'shell', inline: register_script
@@ -61,16 +69,10 @@ Vagrant.configure('2') do |config|
     trigger.run_remote = { inline: unregister_script }
     trigger.on_error = :continue
   end
+
   if CONFIG_ENGINE == 'ansible'
     config.vm.provision 'ansible' do |ansible|
       ansible.playbook = "ansible/#{ANSIBLE_PLAYBOOK}/#{ANSIBLE_ROLE}/#{ANSIBLE_SETUP_FILE}"
-    end
-  elsif CONFIG_ENGINE == 'chef'
-    config.vm.provision 'chef_zero' do |chef|
-      chef.arguments = '--chef-license accept'
-      chef.cookbooks_path = './cookbooks'
-      chef.nodes_path = './nodes'
-      chef.add_recipe "#{CHEF_RECIPE}"
     end
   else
     config.vm.provision 'shell', inline: <<-SHELL

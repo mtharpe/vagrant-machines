@@ -1,13 +1,14 @@
 galaxy_info:
   author: Michael Tharpe
-  description: Basic Fedora Server
+  description: Basic Centos Server
   license: license (GPL-2.0-or-later, MIT, etc)
   min_ansible_version: 2.9
 
   platforms:
-    - name: Fedora
+    - name: EL
       versions:
-        - 33
+        - 7
+        - 8
 
   galaxy_tags: []
 
