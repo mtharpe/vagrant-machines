@@ -1,0 +1,59 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+MACHINE_NAME = 'centos-6'.freeze
+
+# Config engine (Ansible or Chef)
+CONFIG_ENGINE = 'ansible'.freeze
+
+# Ansible global controls
+ANSIBLE_PLAYBOOK = 'ansible-centos-base'.freeze
+ANSIBLE_ROLE = 'server'.freeze
+ANSIBLE_SETUP_FILE = 'setup_server.yml'.freeze
+
+# Chef global controls
+CHEF_RECIPE = 'chef-linux-base-recipe'.freeze
+
+Vagrant.configure(2) do |config|
+  config.vm.box = 'generic/centos6'
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.network :private_network, auto_network: true
+  config.vm.hostname = MACHINE_NAME
+  # config.vm.network "forwarded_port", guest: 9090, host: 9090
+  # config.vm.network 'private_network', type: 'dhcp'
+  # config.vm.network 'public_network', type: 'dhcp', bridge: 'enp0s31f6'
+
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.hostmanager.manage_guest = true
+  config.hostmanager.ignore_private_ip = false
+  config.hostmanager.include_offline = true
+
+  config.vm.provider 'virtualbox' do |v|
+    v.gui = false
+    v.name = MACHINE_NAME
+    v.cpus = 1
+    v.memory = 4096
+    v.linked_clone = false
+    config.vm.box_check_update = false
+    v.check_guest_additions = true
+    v.customize ['setextradata', :id, 'VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root', '1']
+  end
+
+  if CONFIG_ENGINE == 'ansible'
+    config.vm.provision 'ansible' do |ansible|
+      ansible.playbook = "ansible/#{ANSIBLE_PLAYBOOK}/#{ANSIBLE_ROLE}/#{ANSIBLE_SETUP_FILE}"
+    end
+  elsif CONFIG_ENGINE == 'chef'
+    config.vm.provision 'chef_zero' do |chef|
+      chef.arguments = '--chef-license accept'
+      chef.cookbooks_path = './cookbooks'
+      chef.nodes_path = './nodes'
+      chef.add_recipe "#{CHEF_RECIPE}"
+    end
+  else
+    config.vm.provision 'shell', inline: <<-SHELL
+      sudo dnf upgrade -y
+    SHELL
+  end
+end

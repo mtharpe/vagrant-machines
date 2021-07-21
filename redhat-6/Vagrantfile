@@ -1,0 +1,41 @@
+Vagrant.require_version '>= 2.1.0'
+
+user = ENV['RH_SUBSCRIPTION_MANAGER_USER']
+password = ENV['RH_SUBSCRIPTION_MANAGER_PW']
+if !user || !password
+  puts 'Required environment variables not found. Please set RH_SUBSCRIPTION_MANAGER_USER and RH_SUBSCRIPTION_MANAGER_PW'
+  abort
+end
+
+register_script = %(
+if ! subscription-manager status; then
+  sudo subscription-manager register --username=#{user} --password=#{password} --auto-attach
+fi
+
+yum upgrade -y
+)
+
+unregister_script = %(
+if subscription-manager status; then
+  sudo subscription-manager unregister
+fi
+)
+
+Vagrant.configure('2') do |config|
+  config.vm.box = 'generic/rhel6'
+
+  config.vm.provider 'virtualbox' do |vb|
+    vb.cpus = 2
+    vb.memory = '2048'
+  end
+
+  config.vm.provision 'shell', inline: register_script
+
+  config.trigger.before :destroy do |trigger|
+    trigger.name = 'Before Destroy trigger'
+    trigger.info = 'Unregistering this VM from RedHat Subscription Manager...'
+    trigger.warn = 'If this fails, unregister VMs manually at https://access.redhat.com/management/subscriptions'
+    trigger.run_remote = { inline: unregister_script }
+    trigger.on_error = :continue
+  end
+end

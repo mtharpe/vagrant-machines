@@ -1,0 +1,41 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+MACHINE_NAME = 'windows-2019'.freeze
+
+Vagrant.configure(2) do |config|
+  config.vm.box = 'StefanScherer/windows_2019'
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.network :private_network, auto_network: true
+  config.vm.hostname = MACHINE_NAME
+  config.vm.network 'private_network', type: 'dhcp'
+  config.vm.network 'public_network', type: 'dhcp', bridge: 'enp0s31f6'
+
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.hostmanager.manage_guest = true
+  config.hostmanager.ignore_private_ip = false
+  config.hostmanager.include_offline = true
+
+  config.vm.provider 'virtualbox' do |v|
+    v.gui = true
+    v.name = MACHINE_NAME
+    v.cpus = 1
+    v.memory = 4096
+    v.linked_clone = false
+    config.vm.box_check_update = false
+    v.check_guest_additions = true
+  end
+
+  config.vm.provision 'shell', inline: <<-SHELL
+  Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+  choco feature enable -n allowGlobalConfirmation
+  CINST Boxstarter -y
+  Enable-MicrosoftUpdate
+  Install-WindowsUpdate
+  Enable-RemoteDesktop
+  Disable-BingSearch
+  Disable-InternetExplorerESC
+  Invoke-Reboot
+  SHELL
+end
