@@ -11,42 +11,37 @@ ANSIBLE_PLAYBOOK = 'ansible-fedora-base'.freeze
 ANSIBLE_ROLE = 'workstation'.freeze
 ANSIBLE_SETUP_FILE = 'setup_workstation.yml'.freeze
 
-# Chef global controls
-CHEF_RECIPE = 'chef-linux-base-recipe'.freeze
-
-Vagrant.configure(2) do |config|
-  config.vm.box = 'generic/fedora33'
-  config.vm.synced_folder '.', '/vagrant', disabled: true
-  config.vm.network :private_network, auto_network: true
+Vagrant.configure("2") do |config|
   config.vm.hostname = MACHINE_NAME
-
+  config.vm.box = "generic/fedora33"
+  config.vm.provider :libvirt do |domain|
+      domain.memory = 2048
+      domain.cpus = 1
+      domain.nested = true
+  # config.vm.network :private_network, :ip => '10.20.30.40'
+  # config.vm.network :public_network, :ip => '10.20.30.41'
   config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
   config.hostmanager.manage_guest = true
   config.hostmanager.ignore_private_ip = false
   config.hostmanager.include_offline = true
+  end
 
-  config.vm.provider 'virtualbox' do |v|
-    v.gui = true
-    v.name = MACHINE_NAME
-    v.cpus = 1
-    v.memory = 4096
-    v.linked_clone = false
-    config.vm.box_check_update = false
-    v.check_guest_additions = true
-    v.customize ['setextradata', :id, 'VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root', '1']
+  config.vm.provider :libvirt do |libvirt|
+    libvirt.driver = "kvm"
+    libvirt.storage_pool_name = "default"
+    libvirt.snapshot_pool_name = "default"
+    # libvirt.default_prefix = 'vagrant-'
+    # libvirt.qemu_use_session = true
+    # libvirt.host = "localhost"
+    # libvirt.connect_via_ssh = false
+    # libvirt.username = "root"
+    # libvirt.password = "secret"
   end
 
   if CONFIG_ENGINE == 'ansible'
     config.vm.provision 'ansible' do |ansible|
       ansible.playbook = "ansible/#{ANSIBLE_PLAYBOOK}/#{ANSIBLE_ROLE}/#{ANSIBLE_SETUP_FILE}"
-    end
-  elsif CONFIG_ENGINE == 'chef'
-    config.vm.provision 'chef_zero' do |chef|
-      chef.arguments = '--chef-license accept'
-      chef.cookbooks_path = './cookbooks'
-      chef.nodes_path = './nodes'
-      chef.add_recipe "#{CHEF_RECIPE}"
     end
   else
     config.vm.provision 'shell', inline: <<-SHELL
