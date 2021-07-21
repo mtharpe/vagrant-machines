@@ -1,4 +1,4 @@
-![Vagrant Validation](https://github.com/mtharpe/vagrant-machines/workflows/Vagrant%20Validation/badge.svg)
+[![Vagrant Validation](https://github.com/mtharpe/vagrant-machines/actions/workflows/main.yml/badge.svg?branch=libvirt)](https://github.com/mtharpe/vagrant-machines/actions/workflows/main.yml)
 
 # The Vagrant Machines Repo
 
