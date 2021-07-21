@@ -18,7 +18,7 @@ validate:
   	cd $$box && printf "\nValidating $$box\n" $$box && vagrant validate || true && cd ..; done
 
 plugins:
-	vagrant plugin install vagrant-hostmanager vagrant-berkshelf vagrant-clean vagrant-auto_network vagrant-cachier vagrant-vbguest vagrant-scp 
+	vagrant plugin install vagrant-hostmanager vagrant-berkshelf vagrant-clean vagrant-auto_network vagrant-cachier vagrant-vbguest vagrant-scp vagrant-libvirt
 
 clean:
 	@vagrant box prune
