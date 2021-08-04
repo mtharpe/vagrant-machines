@@ -1,0 +1,6 @@
+---
+- name: Enable TLP
+  service:
+    name: tlp
+    enabled: yes
+    state: started
