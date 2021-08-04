@@ -1,0 +1,21 @@
+---
+- name: Enable RPMForge Non-Free repo
+  yum_repository:
+    name: rpmfusion-non-free
+    description: RPMFusion Non-Free
+    mirrorlist: https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
+    enabled: yes
+    state: present
+
+- name: Enable RPMForge Free repo
+  yum_repository:
+    name: rpmfusion-free
+    description: RPMFusion Free
+    mirrorlist: https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
+    enabled: yes
+    state: present
+
+- name: Enable HashiCorp repo
+  get_url:
+    url: https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
+    dest: /etc/yum.repos.d/hashicorp.repo

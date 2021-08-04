@@ -1,0 +1,71 @@
+---
+- name: Install the RPMForge Non-Free repo
+  yum_repository:
+    name: rpmfusion-non-free
+    description: RPMFusion Non-Free
+    mirrorlist: https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
+    enabled: yes
+    state: present
+
+- name: Install the RPMForge Free repo
+  yum_repository:
+    name: rpmfusion-free
+    description: RPMFusion Free
+    mirrorlist: https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
+    enabled: yes
+    state: present
+
+- name: Install the Google Chrome repo
+  yum_repository:
+    name: google-chrome-stable
+    description: Google Chrome Stable Repo
+    baseurl: http://dl.google.com/linux/chrome/rpm/stable/x86_64
+    gpgkey: https://dl.google.com/linux/linux_signing_key.pub
+    gpgcheck: yes
+    enabled: yes
+    state: present
+
+- name: Install HashiCorp repo
+  get_url:
+    url: https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+    dest: /etc/yum.repos.d/hashicorp.repo
+
+- name: Install the Azure CLI repo
+  yum_repository:
+    name: azure-cli
+    description: Azure CLI repo
+    baseurl: https://packages.microsoft.com/yumrepos/azure-cli
+    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+    gpgcheck: yes
+    enabled: yes
+    state: present
+
+- name: Install the Docker CE repo
+  yum_repository:
+    name: docker-ce
+    description: Docker CE repo
+    baseurl: https://download.docker.com/linux/fedora/32/$basearch/stable
+    gpgkey: https://download.docker.com/linux/fedora/gpg
+    gpgcheck: yes
+    enabled: yes
+    state: present
+
+- name: Install the Slack repo
+  yum_repository:
+    name: slack
+    description: Slack repo
+    baseurl: https://packagecloud.io/slacktechnologies/slack/fedora/21/x86_64
+    gpgkey: https://slack.com/gpg/slack_pubkey_2019.gpg
+    gpgcheck: yes
+    enabled: yes
+    state: present
+
+- name: Install the VSCode repo
+  yum_repository:
+    name: vscode
+    description: VSCode repo
+    baseurl: https://packages.microsoft.com/yumrepos/vscode
+    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+    gpgcheck: yes
+    enabled: yes
+    state: present
