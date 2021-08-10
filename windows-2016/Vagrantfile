@@ -4,7 +4,7 @@
 # Define Machine name
 MACHINE_NAME = 'windows-2016'.freeze
 
-# Config engine (Ansible or Chef)
+# Config engine (Ansible)
 CONFIG_ENGINE = 'ansible'.freeze
 
 # Ansible global controls

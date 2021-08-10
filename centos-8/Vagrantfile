@@ -3,16 +3,13 @@
 
 MACHINE_NAME = 'centos-8'.freeze
 
-# Config engine (Ansible or Chef)
+# Config engine (Ansible)
 CONFIG_ENGINE = 'ansible'.freeze
 
 # Ansible global controls
 ANSIBLE_PLAYBOOK = 'ansible-centos-base'.freeze
 ANSIBLE_ROLE = 'server'.freeze
 ANSIBLE_SETUP_FILE = 'setup_server.yml'.freeze
-
-# Chef global controls
-CHEF_RECIPE = 'chef-linux-base-recipe'.freeze
 
 Vagrant.configure(2) do |config|
   config.vm.box = 'generic/centos8'
@@ -43,13 +40,6 @@ Vagrant.configure(2) do |config|
   if CONFIG_ENGINE == 'ansible'
     config.vm.provision 'ansible' do |ansible|
       ansible.playbook = "ansible/#{ANSIBLE_PLAYBOOK}/#{ANSIBLE_ROLE}/#{ANSIBLE_SETUP_FILE}"
-    end
-  elsif CONFIG_ENGINE == 'chef'
-    config.vm.provision 'chef_zero' do |chef|
-      chef.arguments = '--chef-license accept'
-      chef.cookbooks_path = './cookbooks'
-      chef.nodes_path = './nodes'
-      chef.add_recipe "#{CHEF_RECIPE}"
     end
   else
     config.vm.provision 'shell', inline: <<-SHELL
