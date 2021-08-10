@@ -7,7 +7,7 @@ box =
 
 install:
 	@for box in $(targets); do \
-		printf "\nInstalling $$box\n" && vagrant box add $$box --provider=$(hypervisor); done
+		printf "\nInstalling $$box\n" && vagrant box add $$box --provider=$(hypervisor) --force; done
 update:
 	@for box in $(targets); do \
 		printf "\nUpdating $$box\n" && vagrant box update --box $$box; done
