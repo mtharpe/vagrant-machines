@@ -3,7 +3,7 @@
 
 MACHINE_NAME = 'fedora-workstation'.freeze
 
-# Config engine (Ansible or Chef)
+# Config engine (Ansible)
 # CONFIG_ENGINE = 'ansible'.freeze
  CONFIG_ENGINE = 'nothing'.freeze
 

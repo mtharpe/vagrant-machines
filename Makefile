@@ -31,8 +31,6 @@ vm:
 	@sed -i 's/template-vm/$(name)/g' ./$(name)/Vagrantfile
 	@sed -i 's/generic\/$(name)/generic\/$(box)/g' ./$(name)/Vagrantfile
 	@ln -s ./provisioners/ansible ./$(name)/ansible
-	@ln -s ./provisioners/chef/cookbooks ./$(name)/cookbooks
-	@ln -s ./provisioners/chef/nodes ./$(name)/nodes
 
 links:
 	@for i in `ls -d */`; do ( cd $i && make links ) || true; done
