@@ -5,3 +5,11 @@ links:
 clean:
 	echo "Removing symlinks for provisioners"
 	@unlink ansible || true
+
+start:
+	$(MAKE) links
+	vagrant up
+
+stop:
+	vagrant destroy -f
+	$(MAKE) clean
