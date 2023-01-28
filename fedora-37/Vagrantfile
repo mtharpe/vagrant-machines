@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-MACHINE_NAME = 'ubuntu-18'.freeze
+MACHINE_NAME = 'fedora-37'.freeze
 
 # Config engine (Ansible)
 CONFIG_ENGINE = 'ansible'.freeze
@@ -12,7 +12,7 @@ ANSIBLE_ROLE = 'server'.freeze
 ANSIBLE_SETUP_FILE = 'setup_server.yml'.freeze
 
 Vagrant.configure(2) do |config|
-  config.vm.box = 'generic/ubuntu1804'
+  config.vm.box = 'generic/fedora37'
   config.vm.synced_folder '.', '/vagrant', disabled: true
   config.vm.network :private_network, auto_network: true
   config.vm.hostname = MACHINE_NAME
