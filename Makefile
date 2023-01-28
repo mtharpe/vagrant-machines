@@ -1,4 +1,4 @@
-LIST = centos7 centos8 rhel7 rhel8 ubuntu1804 ubuntu2004 fedora33 fedora34
+LIST = rhel8 rhel9 ubuntu2004 ubuntu2204 fedora36 fedora37
 targets = $(addprefix generic/, $(LIST))
 hypervisor = virtualbox
 installed := $(vagrant box list)
@@ -18,7 +18,7 @@ validate:
   	cd $$box && printf "\nValidating $$box\n" $$box && vagrant validate || true && cd ..; done
 
 plugins:
-	vagrant plugin install vagrant-hostmanager vagrant-clean vagrant-auto_network vagrant-cachier vagrant-vbguest vagrant-scp 
+	vagrant plugin install vagrant-clean vagrant-hostmanager vagrant-auto_network vagrant-cachier vagrant-vbguest vagrant-scp 
 
 clean:
 	@vagrant box prune
