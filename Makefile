@@ -1,4 +1,4 @@
-LIST = rhel8 rhel9 ubuntu2004 ubuntu2204 fedora36 fedora37
+LIST = rhel8 rhel9 ubuntu2004 ubuntu2204 fedora36 fedora37 fedora38 fedora39
 targets = $(addprefix generic/, $(LIST))
 hypervisor = virtualbox
 installed := $(vagrant box list)
