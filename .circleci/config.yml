@@ -7,12 +7,9 @@ version: 2.1
 jobs:
   validate:
     docker:
-      - image: cfinfrastructure/vagrant
+      - image: dockette/vagrant
     steps:
       - checkout
-      - run:
-          name: "Install Vagrant"
-          command: "sudo apt-get install -y vagrant"
       - run:
           name: "Run Validation"
           command: "./validate.sh"
