@@ -12,7 +12,7 @@ jobs:
       - checkout
       - run:
           name: "Install Vagrant"
-          command: "apt-get install -y vagrant"
+          command: "sudo apt-get install -y vagrant"
       - run:
           name: "Run Validation"
           command: "./validate.sh"
