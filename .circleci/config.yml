@@ -7,14 +7,9 @@ version: 2.1
 jobs:
   validate:
     docker:
-      - image: ubuntu:latest
+      - image: vagrantlibvirt/vagrant-libvirt:latest
     steps:
       - checkout
-      - run:
-          name: "Install Vagrant"
-          command: |
-            echo "deb https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
-            apt update && apt install vagrant -y
       - run:
           name: "Run Validation"
           command: "./validate.sh"
