@@ -11,6 +11,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: "Install Vagrant Plugins"
+          command: "vagrant plugin install vagrant-clean vagrant-hostmanager vagrant-auto_network vagrant-cachier vagrant-vbguest vagrant-scp"
+      - run:
           name: "Run Validation"
           command: "./validate.sh"
 workflows:
