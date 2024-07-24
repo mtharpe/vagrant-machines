@@ -7,7 +7,7 @@ version: 2.1
 jobs:
   validate:
     docker:
-      - image: cimg/base:current
+      - image: cfinfrastructure/vagrant
     steps:
       - checkout
       - run:
