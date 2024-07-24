@@ -7,9 +7,12 @@ version: 2.1
 jobs:
   validate:
     docker:
-      - image: dockette/vagrant
+      - image: ubuntu:latest
     steps:
       - checkout
+      - run:
+          name: "Install Vagrant"
+          command: "sudo apt update && sudo apt upgrade -y && apt install vagrant"
       - run:
           name: "Run Validation"
           command: "./validate.sh"
