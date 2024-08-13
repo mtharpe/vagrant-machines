@@ -14,17 +14,10 @@ ANSIBLE_SETUP_FILE = 'setup_server.yml'.freeze
 Vagrant.configure(2) do |config|
   config.vm.box = 'generic/ubuntu2204'
   config.vm.synced_folder '.', '/vagrant', disabled: true
-  config.vm.network :private_network, auto_network: true
   config.vm.hostname = MACHINE_NAME
   # config.vm.network "forwarded_port", guest: 9090, host: 9090
   # config.vm.network 'private_network', type: 'dhcp'
-  # config.vm.network 'public_network', type: 'dhcp', bridge: 'enp0s31f6'
-
-  config.hostmanager.enabled = true
-  config.hostmanager.manage_host = true
-  config.hostmanager.manage_guest = true
-  config.hostmanager.ignore_private_ip = false
-  config.hostmanager.include_offline = true
+  # config.vm.network 'public_network', type: 'dhcp', bridge: 'eth0'
 
   config.vm.provider 'virtualbox' do |v|
     v.gui = false
