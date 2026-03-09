@@ -5,7 +5,8 @@
   gather_facts: true
 
   vars:
-    - username: vagrant
-    
+    username: vagrant
+
   tasks:
-    - include_tasks: tasks/main.yml
+    - name: Include main tasks
+      ansible.builtin.include_tasks: tasks/main.yml

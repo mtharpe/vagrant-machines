@@ -1,5 +1,5 @@
-LIST = rhel9 ubuntu2204 fedora39
-targets = $(addprefix generic/, $(LIST))
+LIST = ubuntu-22.04 ubuntu-24.04 rockylinux-9 rockylinux-10.0 fedora-42
+targets = $(addprefix bento/, $(LIST))
 hypervisor = virtualbox
 installed := $(vagrant box list)
 name = 

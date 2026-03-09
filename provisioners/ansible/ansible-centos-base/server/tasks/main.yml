@@ -1,8 +1,8 @@
 ---
-- include_tasks: repo.yml
-
+- name: Include repository tasks
+  ansible.builtin.include_tasks: repo.yml
 - name: Install Common Packages
-  yum:
+  ansible.builtin.dnf:
     name:
       - wget
       - unzip
@@ -13,5 +13,5 @@
       - consul
       - nomad
       - waypoint
-    disable_gpg_check: yes
+    disable_gpg_check: true
     state: present

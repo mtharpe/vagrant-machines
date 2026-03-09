@@ -6,5 +6,5 @@
 
 - name: Add HashiCorp Repo
   ansible.builtin.apt_repository:
-    repo: deb [arch=amd64] https://apt.releases.hashicorp.com {{ansible_distribution_release}} main
+    repo: deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main
     state: present

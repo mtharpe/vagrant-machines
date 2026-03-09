@@ -1,26 +1,24 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Define Machine name
-MACHINE_NAME = 'windows-2016'.freeze
+MACHINE_NAME = 'ubuntu-2204'.freeze
 
 # Config engine (Ansible)
 CONFIG_ENGINE = 'ansible'.freeze
 
 # Ansible global controls
-ANSIBLE_PLAYBOOK = 'ansible-windows-base'.freeze
+ANSIBLE_PLAYBOOK = 'ansible-fedora-base'.freeze
 ANSIBLE_ROLE = 'server'.freeze
 ANSIBLE_SETUP_FILE = 'setup_server.yml'.freeze
 
-
 Vagrant.configure(2) do |config|
-  config.vm.box = 'mwrock/Windows2016'
+  config.vm.box = 'generic/ubuntu-2204'
   config.vm.synced_folder '.', '/vagrant', disabled: true
   config.vm.network :private_network, auto_network: true
   config.vm.hostname = MACHINE_NAME
-  # config.vm.network 'forwarded_port', guest: 9090, host: 9090
-  config.vm.network 'private_network', type: 'dhcp'
-  config.vm.network 'public_network', type: 'dhcp', bridge: 'enp0s31f6'
+  # config.vm.network "forwarded_port", guest: 9090, host: 9090
+  # config.vm.network 'private_network', type: 'dhcp'
+  # config.vm.network 'public_network', type: 'dhcp', bridge: 'enp0s31f6'
 
   config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
@@ -29,13 +27,14 @@ Vagrant.configure(2) do |config|
   config.hostmanager.include_offline = true
 
   config.vm.provider 'virtualbox' do |v|
-    v.gui = true
+    v.gui = false
     v.name = MACHINE_NAME
     v.cpus = 1
     v.memory = 4096
     v.linked_clone = false
     config.vm.box_check_update = false
     v.check_guest_additions = true
+    v.customize ['setextradata', :id, 'VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root', '1']
   end
 
   if CONFIG_ENGINE == 'ansible'
@@ -44,7 +43,7 @@ Vagrant.configure(2) do |config|
     end
   else
     config.vm.provision 'shell', inline: <<-SHELL
-      hostname
+      sudo dnf upgrade -y
     SHELL
   end
 end
