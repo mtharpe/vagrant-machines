@@ -4,4 +4,5 @@
   gather_facts: true
 
   tasks:
-    - include_tasks: tasks/main.yml
+    - name: Include main tasks
+      ansible.builtin.include_tasks: tasks/main.yml

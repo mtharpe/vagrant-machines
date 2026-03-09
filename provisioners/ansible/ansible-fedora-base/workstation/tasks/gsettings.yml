@@ -1,52 +1,77 @@
 ---
 - name: Set Dark Theme
-  command: gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
-  become_user: '{{ username }}'
+  ansible.builtin.command: gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+  become: true
+  become_user: "{{ username }}"
+  changed_when: true
 
 - name: Set Time Format
-  command: gsettings set org.gnome.desktop.interface clock-format 12h
-  become_user: '{{ username }}'
+  ansible.builtin.command: gsettings set org.gnome.desktop.interface clock-format 12h
+  become: true
+  become_user: "{{ username }}"
+  changed_when: true
 
 - name: Disable Window Anamations
-  command: gsettings set org.gnome.desktop.interface enable-animations false
-  become_user: '{{ username }}'
+  ansible.builtin.command: gsettings set org.gnome.desktop.interface enable-animations false
+  become: true
+  become_user: "{{ username }}"
+  changed_when: true
 
 - name: Add Maximize Minimize and Close
-  command: gsettings set org.gnome.desktop.wm.preferences button-layout ":minimize,maximize,close"
-  become_user: '{{ username }}'
+  ansible.builtin.command: gsettings set org.gnome.desktop.wm.preferences button-layout ":minimize,maximize,close"
+  become: true
+  become_user: "{{ username }}"
+  changed_when: true
 
-- name: Get Termianl Profile Default Settings
-  command: gsettings get org.gnome.Terminal.ProfilesList default #| awk -F \\' '{print $2}'
+- name: Get Terminal Profile Default Settings
+  ansible.builtin.command: gsettings get org.gnome.Terminal.ProfilesList default
   register: term
-  become_user: '{{ username }}'
+  become: true
+  become_user: "{{ username }}"
+  changed_when: false
 
-- debug:
-    msg: echo {{ term.stdout }}
+- name: Display Terminal Profile
+  ansible.builtin.debug:
+    msg: "{{ term.stdout }}"
 
-- name: Set Termainal Font
-  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ font 'Monospace 14'
-  become_user: '{{ username }}'
+- name: Set Terminal Font
+  ansible.builtin.command: "gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ font 'Monospace 14'"
+  become: true
+  become_user: "{{ username }}"
+  changed_when: true
 
 - name: Set Terminal Disable System Font
-  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ use-system-font false
-  become_user: '{{ username }}'
+  ansible.builtin.command: "gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ use-system-font false"
+  become: true
+  become_user: "{{ username }}"
+  changed_when: true
 
 - name: Set Terminal Disable Bell Font
-  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ audible-bell false
-  become_user: '{{ username }}'
+  ansible.builtin.command: "gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ audible-bell false"
+  become: true
+  become_user: "{{ username }}"
+  changed_when: true
 
 - name: Set Terminal Disable Color Themes
-  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ use-theme-colors false
-  become_user: '{{ username }}'
+  ansible.builtin.command: "gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ use-theme-colors false"
+  become: true
+  become_user: "{{ username }}"
+  changed_when: true
 
 - name: Set Terminal BG Color
-  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ background-color '#000000'
-  become_user: '{{ username }}'
+  ansible.builtin.command: "gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ background-color '#000000'"
+  become: true
+  become_user: "{{ username }}"
+  changed_when: true
 
 - name: Set Terminal FG Color
-  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ foreground-color '#AFAFAF'
-  become_user: '{{ username }}'
+  ansible.builtin.command: "gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ foreground-color '#AFAFAF'"
+  become: true
+  become_user: "{{ username }}"
+  changed_when: true
 
 - name: Set Terminal Scrollbar Policy
-  command: gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ scrollbar-policy never
-  become_user: '{{ username }}'
+  ansible.builtin.command: "gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{{ term.stdout }}/ scrollbar-policy never"
+  become: true
+  become_user: "{{ username }}"
+  changed_when: true

@@ -1,9 +1,10 @@
 ---
-- include_tasks: security.yml
-- include_tasks: updates.yml
-
+- name: Include security tasks
+  ansible.builtin.include_tasks: security.yml
+- name: Include updates tasks
+  ansible.builtin.include_tasks: updates.yml
 - name: Install Common Packages
-  win_chocolatey:
+  chocolatey.chocolatey.win_chocolatey:
     name:
       - googlechrome
       - 7zip

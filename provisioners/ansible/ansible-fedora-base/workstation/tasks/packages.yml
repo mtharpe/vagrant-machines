@@ -6,7 +6,7 @@
 #     state: present
 
 - name: Install common workstation packages
-  dnf:
+  ansible.builtin.dnf:
     name:
       - "@Container Management"
       - "@Development Tools"
@@ -20,5 +20,5 @@
       - azure-cli
       - tlp
       - tlp-rdw
-    disable_gpg_check: yes
+    disable_gpg_check: true
     state: present

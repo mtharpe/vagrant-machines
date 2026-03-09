@@ -6,7 +6,7 @@
 #     state: present
 
 - name: Install common workstation packages
-  yum:
+  ansible.builtin.dnf:
     name:
       - "@Workstation"
       - "@Development Tools"
@@ -24,5 +24,5 @@
       - consul
       - nomad
       - waypoint
-    disable_gpg_check: yes
+    disable_gpg_check: true
     state: present

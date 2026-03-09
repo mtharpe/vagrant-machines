@@ -1,11 +1,15 @@
 ---
-- include_tasks: repo.yml
-- include_tasks: packages.yml
-- include_tasks: services.yml
-- include_tasks: gsettings.yml
-
+- name: Include repository tasks
+  ansible.builtin.include_tasks: repo.yml
+- name: Include package tasks
+  ansible.builtin.include_tasks: packages.yml
+- name: Include service tasks
+  ansible.builtin.include_tasks: services.yml
+- name: Include gsettings tasks
+  ansible.builtin.include_tasks: gsettings.yml
 - name: Setting Graphical Target
-  shell: systemctl set-default graphical.target
-
-- debug:
+  ansible.builtin.command: systemctl set-default graphical.target
+  changed_when: true
+- name: Reboot notification
+  ansible.builtin.debug:
     msg: "Please reboot this machine to enable Gnome"
