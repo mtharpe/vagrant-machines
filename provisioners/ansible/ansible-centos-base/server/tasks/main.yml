@@ -7,7 +7,6 @@
       - wget
       - unzip
       - curl
-      - nmon
       - terraform
       - vault
       - consul
@@ -15,3 +14,12 @@
       - waypoint
     disable_gpg_check: true
     state: present
+
+- name: Install nmon on supported RHEL-family releases
+  ansible.builtin.dnf:
+    name: nmon
+    disable_gpg_check: true
+    state: present
+  when:
+    - ansible_os_family == 'RedHat'
+    - (ansible_distribution_major_version | int) < 10
