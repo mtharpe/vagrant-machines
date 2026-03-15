@@ -11,10 +11,15 @@ ANSIBLE_PLAYBOOK = 'ansible-fedora-base'.freeze
 ANSIBLE_ROLE = 'server'.freeze
 ANSIBLE_SETUP_FILE = 'setup_server.yml'.freeze
 
+# Hypervisor/provider controls
+VAGRANT_PROVIDER = 'virtualbox'.freeze
+
 Vagrant.configure(2) do |config|
   config.vm.box = 'generic/template-vm'
   config.vm.synced_folder '.', '/vagrant', disabled: true
-  config.vm.network :private_network, auto_network: true
+  if VAGRANT_PROVIDER != 'libvirt'
+    config.vm.network :private_network, auto_network: true
+  end
   config.vm.hostname = MACHINE_NAME
   # config.vm.network "forwarded_port", guest: 9090, host: 9090
   # config.vm.network 'private_network', type: 'dhcp'
@@ -23,18 +28,39 @@ Vagrant.configure(2) do |config|
   config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
   config.hostmanager.manage_guest = true
-  config.hostmanager.ignore_private_ip = false
+  config.hostmanager.ignore_private_ip = (VAGRANT_PROVIDER == 'libvirt')
   config.hostmanager.include_offline = true
 
-  config.vm.provider 'virtualbox' do |v|
-    v.gui = false
-    v.name = MACHINE_NAME
-    v.cpus = 1
-    v.memory = 4096
-    v.linked_clone = false
-    config.vm.box_check_update = false
-    v.check_guest_additions = true
-    v.customize ['setextradata', :id, 'VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root', '1']
+  # Rocky/RHEL-family repos can lag exact kernel-devel for the running kernel,
+  # which causes vagrant-vbguest auto update to fail during `vagrant up`.
+  if Vagrant.has_plugin?('vagrant-vbguest')
+    config.vbguest.auto_update = false
+  end
+
+  if VAGRANT_PROVIDER == 'virtualbox'
+    config.vm.provider 'virtualbox' do |v|
+      v.gui = false
+      v.name = MACHINE_NAME
+      v.cpus = 1
+      v.memory = 4096
+      v.linked_clone = false
+      config.vm.box_check_update = false
+      v.check_guest_additions = true
+      v.customize ['setextradata', :id, 'VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root', '1']
+    end
+  elsif VAGRANT_PROVIDER == 'libvirt'
+    config.vm.provider 'libvirt' do |v|
+      # Use qemu:///session so VMs can access box assets under ~/.vagrant.d without home-dir ACL changes.
+      v.uri = 'qemu:///session'
+      v.qemu_use_session = true
+      v.cpus = 1
+      v.memory = 4096
+    end
+  elsif VAGRANT_PROVIDER == 'vmware_desktop'
+    config.vm.provider 'vmware_desktop' do |v|
+      v.cpus = 1
+      v.memory = 4096
+    end
   end
 
   if CONFIG_ENGINE == 'ansible'
