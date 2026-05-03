@@ -5,6 +5,22 @@ set -euo pipefail
 
 provider=$(default_provider)
 arch=$(default_box_arch)
+
+# On Apple Silicon both arches are real choices — prompt unless the user
+# already pinned ARCH=, VAGRANT_BOX_ARCH=, or YES=1.
+if [ -z "${ARCH:-}" ] && [ -z "${VAGRANT_BOX_ARCH:-}" ] && [ "${YES:-0}" != "1" ] \
+   && [ "$(host_platform)" = "darwin-arm64" ] && [ -t 0 ]; then
+  printf 'Which architecture for the boxes?\n' >&2
+  printf '  1) amd64 (x86_64, matches production servers; emulated on Apple Silicon) [default]\n' >&2
+  printf '  2) arm64 (native; faster but does not match x86_64 prod)\n' >&2
+  printf 'Choose [1-2]: ' >&2
+  read -r choice || true
+  case "$choice" in
+    2|arm64) arch=arm64 ;;
+    *)       arch=amd64 ;;
+  esac
+fi
+
 info "Installing boxes for provider: $provider (arch: $arch)"
 echo
 
