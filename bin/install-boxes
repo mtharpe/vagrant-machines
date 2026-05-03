@@ -11,13 +11,13 @@ arch=$(default_box_arch)
 if [ -z "${ARCH:-}" ] && [ -z "${VAGRANT_BOX_ARCH:-}" ] && [ "${YES:-0}" != "1" ] \
    && [ "$(host_platform)" = "darwin-arm64" ] && [ -t 0 ]; then
   printf 'Which architecture for the boxes?\n' >&2
-  printf '  1) amd64 (x86_64, matches production servers; emulated on Apple Silicon) [default]\n' >&2
-  printf '  2) arm64 (native; faster but does not match x86_64 prod)\n' >&2
+  printf '  1) arm64 (native; stable, fast) [default]\n' >&2
+  printf '  2) amd64 (x86_64; matches production but UTM emulation is crash-prone on Apple Silicon)\n' >&2
   printf 'Choose [1-2]: ' >&2
   read -r choice || true
   case "$choice" in
-    2|arm64) arch=arm64 ;;
-    *)       arch=amd64 ;;
+    2|amd64) arch=amd64 ;;
+    *)       arch=arm64 ;;
   esac
 fi
 
