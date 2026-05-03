@@ -55,7 +55,8 @@ case "$provider" in
     check_plugin vagrant-parallels "vagrant plugin install vagrant-parallels"
     ;;
   utm)
-    check_cmd UTM "install UTM from utmapp.com or 'brew install --cask utm'"
+    if [ -d /Applications/UTM.app ]; then info "  ok   UTM.app installed"
+    else info "  MISS UTM.app   (brew install --cask utm)"; status=1; fi
     check_plugin vagrant_utm "vagrant plugin install vagrant_utm"
     ;;
 esac

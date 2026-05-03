@@ -13,7 +13,7 @@ host_platform() {
 
 # Pick the default Vagrant provider for this host.
 #   $VAGRANT_DEFAULT_PROVIDER wins if set.
-#   Apple Silicon  -> qemu (free, native; but limited box ecosystem)
+#   Apple Silicon  -> utm (free, native; uses Apple Virtualization.framework via UTM)
 #   Intel macOS    -> virtualbox
 #   Linux          -> libvirt if libvirtd present, else virtualbox
 default_provider() {
@@ -22,7 +22,7 @@ default_provider() {
     return
   fi
   case "$(host_platform)" in
-    darwin-arm64)  printf 'qemu\n' ;;
+    darwin-arm64)  printf 'utm\n' ;;
     darwin-*)      printf 'virtualbox\n' ;;
     linux-*)
       if command -v virsh >/dev/null 2>&1; then

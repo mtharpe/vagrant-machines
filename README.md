@@ -50,16 +50,17 @@ VAGRANT_DEFAULT_PROVIDER=libvirt make install
 
 | Host                | Default provider | Notes                                              |
 |---------------------|------------------|----------------------------------------------------|
-| Apple Silicon (Mac) | `qemu`           | Sparse box ecosystem; see note below.              |
+| Apple Silicon (Mac) | `utm`            | Free; UTM uses Apple Virtualization.framework.     |
 | Intel Mac           | `virtualbox`     |                                                    |
 | Linux (libvirtd)    | `libvirt`        | Auto-detected via `virsh`.                         |
 | Linux (no libvirt)  | `virtualbox`     |                                                    |
 
-**Apple Silicon caveat:** `vagrant-qemu` works, but most Vagrant publishers
-either don't ship qemu boxes or mislabel libvirt boxes as qemu. The catalog
-ships with `qemu:` entries blank — fill them in once you find or build a
-working box for each OS. Alternatives if qemu doesn't pan out: `parallels`
-(paid) or `utm` via the `vagrant_utm` plugin.
+**Apple Silicon notes:** `make setup` will install UTM and the `vagrant_utm`
+plugin. The catalog uses Bento boxes (`bento/ubuntu-22.04`, `bento/rockylinux-10.0`,
+etc.), which Bento publishes natively for arm64 across `utm`, `parallels`,
+`virtualbox`, and `vmware_desktop`. The `qemu:` entries are intentionally blank
+because the public qemu/arm64 box ecosystem is broken (publishers ship libvirt
+payloads under a qemu label).
 
 ## Adding an OS
 
