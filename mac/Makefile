@@ -1,10 +1,12 @@
-# Default qemu-compatible boxes. Override with: `make install BOXES='foo/bar baz/qux'`.
+# Default qemu-compatible boxes (arm64 for Apple Silicon).
+# Override with: `make install BOXES='foo/bar baz/qux'`.
 # Find more at https://app.vagrantup.com/boxes/search?provider=qemu
+# Note: Ubuntu 26.04 arm64 is not yet packaged for the qemu provider as of this writing.
 BOXES ?= \
 	perk/ubuntu-2204-arm64 \
-	gyptazy/ubuntu24.04-arm64 \
-	gyptazy/ubuntu24.04-amd64 \
-	gyptazy/rocky9-amd64
+	perk/ubuntu-24.04-arm64 \
+	gyptazy/rocky10.0-arm64 \
+	gyptazy/fedora40-arm64
 hypervisor = qemu
 vm_root = .machines
 name =
