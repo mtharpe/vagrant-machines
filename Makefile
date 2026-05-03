@@ -4,13 +4,14 @@ VM_ROOT ?= .machines
 
 .DEFAULT_GOAL := help
 
-.PHONY: help doctor install new up halt destroy ssh provision status list clean
+.PHONY: help doctor setup install new up halt destroy ssh provision status list clean
 
 help:
 	@echo "Vagrant machines — works the same on Mac (qemu) and Linux (libvirt/virtualbox)."
 	@echo
 	@echo "Setup:"
 	@echo "  make doctor                Check prereqs for your platform"
+	@echo "  make setup                 Install Vagrant provider + plugin for your platform"
 	@echo "  make install               Install all default boxes for your provider"
 	@echo
 	@echo "Create / control machines:"
@@ -28,6 +29,9 @@ help:
 
 doctor:
 	@bin/doctor
+
+setup:
+	@bin/install-provider
 
 install:
 	@bin/install-boxes

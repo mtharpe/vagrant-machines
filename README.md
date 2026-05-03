@@ -26,6 +26,7 @@ the right Ansible playbook for the OS family.
 
 ```sh
 make doctor                         # check prereqs for your platform
+make setup                          # install the right provider + plugin for your host
 make install                        # install default boxes for your provider
 
 make new                            # interactive: pick OS, name, role
