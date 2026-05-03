@@ -64,6 +64,7 @@ echo
 if [ $status -eq 0 ]; then
   info "All checks passed."
 else
-  info "Some checks failed. See hints above."
+  info "Some checks failed. Run 'make setup' to install the provider for your platform,"
+  info "or follow the hints above."
   exit 1
 fi

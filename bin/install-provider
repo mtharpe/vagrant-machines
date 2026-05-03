@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+# Install the Vagrant provider (and its plugin) appropriate for this host.
+#   - macOS Apple Silicon  -> qemu (brew) + vagrant-qemu
+#   - macOS Intel          -> virtualbox (brew cask)
+#   - Linux Debian/Ubuntu  -> libvirt or virtualbox (apt) + vagrant-libvirt
+#   - Linux Fedora/RHEL    -> libvirt (dnf) + vagrant-libvirt
+#
+# Override provider:        PROVIDER=libvirt bin/install-provider
+# Skip confirmation prompt: YES=1 bin/install-provider
+set -euo pipefail
+. "$(dirname "$0")/_lib.sh"
+
+provider="${PROVIDER:-$(default_provider)}"
+yes="${YES:-0}"
+
+confirm() {
+  [ "$yes" = "1" ] && return 0
+  printf '%s [y/N] ' "$1" >&2
+  read -r ans || return 1
+  case "$ans" in y|Y|yes|YES) return 0 ;; *) return 1 ;; esac
+}
+
+run() {
+  printf '+ %s\n' "$*" >&2
+  "$@"
+}
+
+# Detect Linux package manager (lazy — only invoked on linux paths).
+linux_pkg_mgr() {
+  if   command -v apt-get >/dev/null 2>&1; then printf 'apt\n'
+  elif command -v dnf     >/dev/null 2>&1; then printf 'dnf\n'
+  elif command -v yum     >/dev/null 2>&1; then printf 'yum\n'
+  else die "no supported package manager found (apt/dnf/yum)"
+  fi
+}
+
+ensure_brew() {
+  command -v brew >/dev/null 2>&1 || die "Homebrew is required (https://brew.sh)"
+}
+
+install_macos_qemu() {
+  ensure_brew
+  if command -v qemu-system-aarch64 >/dev/null 2>&1; then
+    info "qemu already installed."
+  else
+    confirm "Install qemu via 'brew install qemu'?" || die "aborted"
+    run brew install qemu
+  fi
+  install_plugin vagrant-qemu
+}
+
+install_macos_virtualbox() {
+  ensure_brew
+  if command -v VBoxManage >/dev/null 2>&1; then
+    info "VirtualBox already installed."
+  else
+    confirm "Install VirtualBox via 'brew install --cask virtualbox' (will prompt for admin password)?" || die "aborted"
+    run brew install --cask virtualbox
+  fi
+}
+
+install_linux_virtualbox() {
+  case "$(linux_pkg_mgr)" in
+    apt) confirm "Install VirtualBox via 'sudo apt-get install -y virtualbox'?" || die "aborted"
+         run sudo apt-get update
+         run sudo apt-get install -y virtualbox ;;
+    dnf) confirm "Install VirtualBox via 'sudo dnf install -y VirtualBox'?" || die "aborted"
+         run sudo dnf install -y VirtualBox ;;
+    yum) confirm "Install VirtualBox via 'sudo yum install -y VirtualBox'?" || die "aborted"
+         run sudo yum install -y VirtualBox ;;
+  esac
+}
+
+install_linux_libvirt() {
+  case "$(linux_pkg_mgr)" in
+    apt) confirm "Install libvirt + qemu-kvm via apt?" || die "aborted"
+         run sudo apt-get update
+         run sudo apt-get install -y libvirt-daemon-system libvirt-clients libvirt-dev qemu-kvm bridge-utils virtinst ;;
+    dnf) confirm "Install libvirt + qemu-kvm via dnf?" || die "aborted"
+         run sudo dnf install -y libvirt qemu-kvm libvirt-devel bridge-utils virt-install ;;
+    yum) confirm "Install libvirt + qemu-kvm via yum?" || die "aborted"
+         run sudo yum install -y libvirt qemu-kvm libvirt-devel bridge-utils virt-install ;;
+  esac
+  if ! systemctl is-active --quiet libvirtd 2>/dev/null; then
+    confirm "Enable and start libvirtd?" && run sudo systemctl enable --now libvirtd || true
+  fi
+  if ! id -nG "$USER" | tr ' ' '\n' | grep -qx libvirt; then
+    confirm "Add $USER to the libvirt group? (log out / back in afterwards)" \
+      && run sudo usermod -aG libvirt "$USER" || true
+  fi
+  install_plugin vagrant-libvirt
+}
+
+install_plugin() {
+  local plugin=$1
+  command -v vagrant >/dev/null 2>&1 || die "vagrant is not installed; install it first (brew install --cask vagrant | sudo apt-get install vagrant)"
+  if vagrant plugin list 2>/dev/null | grep -q "^$plugin "; then
+    info "$plugin plugin already installed."
+  else
+    confirm "Install vagrant plugin '$plugin'?" || die "aborted"
+    run vagrant plugin install "$plugin"
+  fi
+}
+
+info "Host:     $(host_platform)"
+info "Provider: $provider"
+echo
+
+case "$(host_platform)::$provider" in
+  darwin-arm64::qemu)        install_macos_qemu ;;
+  darwin-arm64::virtualbox)  die "VirtualBox is not officially supported on Apple Silicon. Use qemu (default), or set PROVIDER=parallels / utm." ;;
+  darwin-*::qemu)            install_macos_qemu ;;
+  darwin-*::virtualbox)      install_macos_virtualbox ;;
+  darwin-*::parallels)       ensure_brew; confirm "Install Parallels via brew cask?" && run brew install --cask parallels; install_plugin vagrant-parallels ;;
+  linux-*::virtualbox)       install_linux_virtualbox ;;
+  linux-*::libvirt)          install_linux_libvirt ;;
+  linux-*::qemu)             die "Use libvirt on Linux instead of qemu (libvirt wraps qemu and has full Vagrant support)." ;;
+  *)                         die "no installer recipe for $(host_platform) + $provider — install manually" ;;
+esac
+
+echo
+info "Done. Run 'make doctor' to verify."
