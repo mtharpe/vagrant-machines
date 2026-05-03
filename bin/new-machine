@@ -52,7 +52,7 @@ case "$role" in server|workstation) ;; *) die "role must be server or workstatio
 
 # provider
 [ -n "$provider" ] || provider=$(default_provider)
-[ -n "$arch" ] || arch=$(host_arch)
+[ -n "$arch" ] || arch=$(default_box_arch)
 
 # resolve catalog
 box=$(catalog_box "$os" "$provider") || die "no box for $os on $provider — edit boxes.yaml or pass provider="

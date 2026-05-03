@@ -20,6 +20,19 @@ host_arch() {
   esac
 }
 
+# Default box architecture for install/new. On Apple Silicon we default to
+# amd64 because UTM users typically want to match x86_64 production systems
+# and emulation cost is acceptable for dev VMs. Override with ARCH=arm64
+# (or VAGRANT_BOX_ARCH) for native-speed VMs on the same hardware.
+default_box_arch() {
+  if [ -n "${ARCH:-}" ]; then printf '%s\n' "$ARCH"; return; fi
+  if [ -n "${VAGRANT_BOX_ARCH:-}" ]; then printf '%s\n' "$VAGRANT_BOX_ARCH"; return; fi
+  case "$(host_platform)" in
+    darwin-arm64) printf 'amd64\n' ;;
+    *)            host_arch ;;
+  esac
+}
+
 # Pick the default Vagrant provider for this host.
 #   $VAGRANT_DEFAULT_PROVIDER wins if set.
 #   Apple Silicon  -> utm (free, native; uses Apple Virtualization.framework via UTM)

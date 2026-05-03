@@ -4,7 +4,7 @@ set -euo pipefail
 . "$(dirname "$0")/_lib.sh"
 
 provider=$(default_provider)
-arch="${ARCH:-$(host_arch)}"
+arch=$(default_box_arch)
 info "Installing boxes for provider: $provider (arch: $arch)"
 echo
 
