@@ -32,7 +32,7 @@ default_box_arch() {
 
 # Pick the default Vagrant provider for this host.
 #   $VAGRANT_DEFAULT_PROVIDER wins if set.
-#   Apple Silicon  -> utm (free, native; uses Apple Virtualization.framework via UTM)
+#   Apple Silicon  -> vmware_desktop (Fusion; free for personal use, supports amd64 emulation)
 #   Intel macOS    -> virtualbox
 #   Linux          -> libvirt if libvirtd present, else virtualbox
 default_provider() {
@@ -41,7 +41,7 @@ default_provider() {
     return
   fi
   case "$(host_platform)" in
-    darwin-arm64)  printf 'utm\n' ;;
+    darwin-arm64)  printf 'vmware_desktop\n' ;;
     darwin-*)      printf 'virtualbox\n' ;;
     linux-*)
       if command -v virsh >/dev/null 2>&1; then

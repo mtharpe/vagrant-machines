@@ -45,19 +45,15 @@ case "$provider" in
     check_cmd virsh "sudo apt install libvirt-clients libvirt-daemon-system qemu-kvm"
     check_plugin vagrant-libvirt "vagrant plugin install vagrant-libvirt"
     ;;
-  qemu)
-    check_cmd qemu-system-aarch64 "brew install qemu"
-    check_plugin vagrant-qemu "vagrant plugin install vagrant-qemu"
-    info "  note  qemu provider boxes are sparse; many publishers mislabel libvirt boxes as qemu."
+  vmware_desktop)
+    if [ -d /Applications/VMware\ Fusion.app ]; then info "  ok   VMware Fusion installed"
+    else info "  MISS VMware Fusion   (manual download from https://support.broadcom.com — see 'make setup')"; status=1; fi
+    check_plugin vagrant-vmware-desktop "vagrant plugin install vagrant-vmware-desktop"
     ;;
   parallels)
-    check_cmd prlctl "install Parallels Desktop"
+    if [ -d /Applications/Parallels\ Desktop.app ]; then info "  ok   Parallels Desktop installed"
+    else info "  MISS Parallels Desktop   (brew install --cask parallels)"; status=1; fi
     check_plugin vagrant-parallels "vagrant plugin install vagrant-parallels"
-    ;;
-  utm)
-    if [ -d /Applications/UTM.app ]; then info "  ok   UTM.app installed"
-    else info "  MISS UTM.app   (brew install --cask utm)"; status=1; fi
-    check_plugin vagrant_utm "vagrant plugin install vagrant_utm"
     ;;
 esac
 

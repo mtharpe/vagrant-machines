@@ -38,26 +38,29 @@ ensure_brew() {
   command -v brew >/dev/null 2>&1 || die "Homebrew is required (https://brew.sh)"
 }
 
-install_macos_qemu() {
-  ensure_brew
-  if command -v qemu-system-aarch64 >/dev/null 2>&1; then
-    info "qemu already installed."
+install_macos_fusion() {
+  if [ -d /Applications/VMware\ Fusion.app ]; then
+    info "VMware Fusion already installed."
   else
-    confirm "Install qemu via 'brew install qemu'?" || die "aborted"
-    run brew install qemu
-  fi
-  install_plugin vagrant-qemu
-}
+    cat >&2 <<'MSG'
+VMware Fusion can no longer be installed via Homebrew (the cask was disabled
+on 2025-06-23 because Broadcom requires an authenticated download).
 
-install_macos_utm() {
-  ensure_brew
-  if [ -d /Applications/UTM.app ]; then
-    info "UTM already installed."
-  else
-    confirm "Install UTM via 'brew install --cask utm'?" || die "aborted"
-    run brew install --cask utm
+Manual install:
+  1. Create a free Broadcom Support Portal account at https://support.broadcom.com
+  2. Navigate to: My Downloads -> VMware Fusion
+  3. Download the latest .dmg, mount it, drag VMware Fusion.app into /Applications
+  4. Run 'VMware Fusion' once to accept the EULA (free for personal use since Nov 2024)
+  5. Re-run 'make setup'
+MSG
+    die "VMware Fusion not installed"
   fi
-  install_plugin vagrant_utm
+  install_plugin vagrant-vmware-desktop
+  if ! command -v vmrun >/dev/null 2>&1; then
+    info "Note: vmrun not found in PATH. The vagrant-vmware-utility installer should be"
+    info "downloaded from https://developer.hashicorp.com/vagrant/install#vmware-utility"
+    info "and run once to give Vagrant network access to Fusion."
+  fi
 }
 
 install_macos_parallels() {
@@ -129,18 +132,16 @@ info "Provider: $provider"
 echo
 
 case "$(host_platform)::$provider" in
-  darwin-arm64::utm)         install_macos_utm ;;
-  darwin-arm64::parallels)   install_macos_parallels ;;
-  darwin-arm64::qemu)        install_macos_qemu ;;
-  darwin-arm64::virtualbox)  die "VirtualBox on Apple Silicon is a dev preview only. Use utm (default), parallels, or vmware_desktop." ;;
-  darwin-*::utm)             install_macos_utm ;;
-  darwin-*::qemu)            install_macos_qemu ;;
-  darwin-*::virtualbox)      install_macos_virtualbox ;;
-  darwin-*::parallels)       install_macos_parallels ;;
-  linux-*::virtualbox)       install_linux_virtualbox ;;
-  linux-*::libvirt)          install_linux_libvirt ;;
-  linux-*::qemu)             die "Use libvirt on Linux instead of qemu (libvirt wraps qemu and has full Vagrant support)." ;;
-  *)                         die "no installer recipe for $(host_platform) + $provider — install manually" ;;
+  darwin-arm64::vmware_desktop) install_macos_fusion ;;
+  darwin-arm64::parallels)      install_macos_parallels ;;
+  darwin-arm64::virtualbox)     die "VirtualBox on Apple Silicon is a dev preview only. Use vmware_desktop (default) or parallels." ;;
+  darwin-*::vmware_desktop)     install_macos_fusion ;;
+  darwin-*::virtualbox)         install_macos_virtualbox ;;
+  darwin-*::parallels)          install_macos_parallels ;;
+  linux-*::virtualbox)          install_linux_virtualbox ;;
+  linux-*::libvirt)             install_linux_libvirt ;;
+  linux-*::qemu)                die "Use libvirt on Linux instead of qemu (libvirt wraps qemu and has full Vagrant support)." ;;
+  *)                            die "no installer recipe for $(host_platform) + $provider — install manually" ;;
 esac
 
 echo

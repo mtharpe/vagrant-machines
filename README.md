@@ -48,19 +48,21 @@ VAGRANT_DEFAULT_PROVIDER=libvirt make install
 
 ## Provider defaults
 
-| Host                | Default provider | Notes                                              |
-|---------------------|------------------|----------------------------------------------------|
-| Apple Silicon (Mac) | `utm`            | Free; UTM uses Apple Virtualization.framework.     |
-| Intel Mac           | `virtualbox`     |                                                    |
-| Linux (libvirtd)    | `libvirt`        | Auto-detected via `virsh`.                         |
-| Linux (no libvirt)  | `virtualbox`     |                                                    |
+| Host                | Default provider  | Notes                                                |
+|---------------------|-------------------|------------------------------------------------------|
+| Apple Silicon (Mac) | `vmware_desktop`  | VMware Fusion (free for personal use; manual install)|
+| Intel Mac           | `virtualbox`      |                                                      |
+| Linux (libvirtd)    | `libvirt`         | Auto-detected via `virsh`.                           |
+| Linux (no libvirt)  | `virtualbox`      |                                                      |
 
-**Apple Silicon notes:** `make setup` will install UTM and the `vagrant_utm`
-plugin. The catalog uses Bento boxes (`bento/ubuntu-22.04`, `bento/rockylinux-10.0`,
-etc.), which Bento publishes natively for arm64 across `utm`, `parallels`,
-`virtualbox`, and `vmware_desktop`. The `qemu:` entries are intentionally blank
-because the public qemu/arm64 box ecosystem is broken (publishers ship libvirt
-payloads under a qemu label).
+**Apple Silicon notes:** Bento publishes the same box image for
+`vmware_desktop`, `parallels`, and `virtualbox` on both arm64 and amd64.
+Fusion 13+ is the recommended free path because it can stably emulate x86_64
+on Apple Silicon; UTM was tried and removed because UTM.app crashes when
+emulating amd64. Fusion's installer must be downloaded manually from
+[Broadcom Support](https://support.broadcom.com) (the Homebrew cask was
+disabled in 2025-06 because the download requires authentication). Parallels
+is a paid alternative installable via `brew install --cask parallels`.
 
 ## Adding an OS
 
