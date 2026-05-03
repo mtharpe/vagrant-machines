@@ -24,4 +24,14 @@
       https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main
     filename: hashicorp
     state: present
+    update_cache: false
+
+- name: Update apt cache (tolerate transient mirror failures)
+  ansible.builtin.apt:
     update_cache: true
+    cache_valid_time: 0
+  retries: 3
+  delay: 5
+  register: apt_update_result
+  until: apt_update_result is succeeded
+  failed_when: false

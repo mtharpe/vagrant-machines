@@ -80,8 +80,6 @@ ANSIBLE_ROLE=$role
 ANSIBLE_SETUP_FILE=$setup_file
 EOF
 
-ln -sf ../../provisioners/ansible "$vm_dir/ansible"
-
 cat <<EOF
 Created $vm_dir
   os:        $os
