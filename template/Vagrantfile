@@ -19,6 +19,7 @@ end
 MACHINE_NAME       = cfg.fetch('MACHINE_NAME')
 VAGRANT_BOX        = cfg.fetch('VAGRANT_BOX')
 VAGRANT_PROVIDER   = cfg.fetch('VAGRANT_PROVIDER')
+VAGRANT_ARCH       = cfg['VAGRANT_ARCH']
 ANSIBLE_PLAYBOOK   = cfg.fetch('ANSIBLE_PLAYBOOK')
 ANSIBLE_ROLE       = cfg.fetch('ANSIBLE_ROLE')
 ANSIBLE_SETUP_FILE = cfg.fetch('ANSIBLE_SETUP_FILE')
@@ -28,6 +29,7 @@ MEMORY  = Integer(ENV.fetch('VM_MEMORY', '4096'))
 
 Vagrant.configure(2) do |config|
   config.vm.box = VAGRANT_BOX
+  config.vm.box_architecture = VAGRANT_ARCH if VAGRANT_ARCH && !VAGRANT_ARCH.empty?
   config.vm.hostname = MACHINE_NAME
   config.vm.synced_folder '.', '/vagrant', disabled: true
 

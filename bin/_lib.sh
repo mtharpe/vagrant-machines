@@ -11,6 +11,15 @@ host_platform() {
   printf '%s-%s\n' "$(uname -s | tr '[:upper:]' '[:lower:]')" "$(uname -m)"
 }
 
+# Vagrant's architecture vocabulary: amd64 / arm64.
+host_arch() {
+  case "$(uname -m)" in
+    arm64|aarch64) printf 'arm64\n' ;;
+    x86_64|amd64)  printf 'amd64\n' ;;
+    *)             printf '%s\n' "$(uname -m)" ;;
+  esac
+}
+
 # Pick the default Vagrant provider for this host.
 #   $VAGRANT_DEFAULT_PROVIDER wins if set.
 #   Apple Silicon  -> utm (free, native; uses Apple Virtualization.framework via UTM)

@@ -1,6 +1,8 @@
 # Thin entry point. Real logic lives in bin/.
 
 VM_ROOT ?= .machines
+# ARCH may be set to amd64 or arm64. Default = host arch (set in bin/_lib.sh).
+export ARCH
 
 .DEFAULT_GOAL := help
 
@@ -17,6 +19,7 @@ help:
 	@echo "Create / control machines:"
 	@echo "  make new                   Interactive: pick OS, name, role"
 	@echo "  make new name=web1 os=ubuntu24 role=server"
+	@echo "  make new name=db1 os=ubuntu24 arch=amd64    (force x86_64 boxes on Apple Silicon)"
 	@echo "  make up name=web1          (cd $(VM_ROOT)/web1 && vagrant up)"
 	@echo "  make ssh name=web1"
 	@echo "  make halt name=web1"
@@ -42,6 +45,7 @@ new:
 		$(if $(os),os=$(os)) \
 		$(if $(role),role=$(role)) \
 		$(if $(provider),provider=$(provider)) \
+		$(if $(arch),arch=$(arch)) \
 		vm_root=$(VM_ROOT)
 
 # Per-VM dispatch. `name=...` is required.

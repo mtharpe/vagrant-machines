@@ -4,7 +4,8 @@ set -euo pipefail
 . "$(dirname "$0")/_lib.sh"
 
 provider=$(default_provider)
-info "Installing boxes for provider: $provider"
+arch="${ARCH:-$(host_arch)}"
+info "Installing boxes for provider: $provider (arch: $arch)"
 echo
 
 failed=()
@@ -15,9 +16,9 @@ while IFS= read -r os_id; do
     info "skip $os_id  (no $provider box in boxes.yaml)"
     continue
   fi
-  printf '\n--- %s (%s) ---\n' "$os_id" "$box"
-  if ! vagrant box add "$box" --provider="$provider" --force; then
-    failed+=("$os_id ($box)")
+  printf '\n--- %s (%s, %s) ---\n' "$os_id" "$box" "$arch"
+  if ! vagrant box add "$box" --provider="$provider" --architecture="$arch" --force; then
+    failed+=("$os_id ($box, $arch)")
   fi
 done < <(list_os_ids)
 

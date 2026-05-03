@@ -10,15 +10,16 @@ set -euo pipefail
 . "$(dirname "$0")/_lib.sh"
 
 # Parse k=v args
-name=""; os=""; role=""; provider=""; vm_root=".machines"
+name=""; os=""; role=""; provider=""; arch=""; vm_root=".machines"
 for arg in "$@"; do
   case "$arg" in
     name=*)     name="${arg#name=}" ;;
     os=*)       os="${arg#os=}" ;;
     role=*)     role="${arg#role=}" ;;
     provider=*) provider="${arg#provider=}" ;;
+    arch=*)     arch="${arg#arch=}" ;;
     vm_root=*)  vm_root="${arg#vm_root=}" ;;
-    *) die "unknown arg: $arg (expected name=, os=, role=, provider=, vm_root=)" ;;
+    *) die "unknown arg: $arg (expected name=, os=, role=, provider=, arch=, vm_root=)" ;;
   esac
 done
 
@@ -51,6 +52,7 @@ case "$role" in server|workstation) ;; *) die "role must be server or workstatio
 
 # provider
 [ -n "$provider" ] || provider=$(default_provider)
+[ -n "$arch" ] || arch=$(host_arch)
 
 # resolve catalog
 box=$(catalog_box "$os" "$provider") || die "no box for $os on $provider — edit boxes.yaml or pass provider="
@@ -72,6 +74,7 @@ cat > "$vm_dir/.vmconfig" <<EOF
 MACHINE_NAME=$name
 VAGRANT_BOX=$box
 VAGRANT_PROVIDER=$provider
+VAGRANT_ARCH=$arch
 ANSIBLE_PLAYBOOK=$playbook
 ANSIBLE_ROLE=$role
 ANSIBLE_SETUP_FILE=$setup_file
@@ -84,6 +87,7 @@ Created $vm_dir
   os:        $os
   box:       $box
   provider:  $provider
+  arch:      $arch
   role:      $role
   playbook:  $playbook/$role/$setup_file
 
