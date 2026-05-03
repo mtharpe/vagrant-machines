@@ -1,0 +1,69 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+MACHINE_NAME = 'template-vm'.freeze
+
+# Config engine (Ansible)
+CONFIG_ENGINE = 'ansible'.freeze
+
+# Ansible global controls
+ANSIBLE_PLAYBOOK = 'ansible-fedora-base'.freeze
+ANSIBLE_ROLE = 'server'.freeze
+ANSIBLE_SETUP_FILE = 'setup_server.yml'.freeze
+
+# Hypervisor/provider controls. Only `qemu` is supported in this repo.
+# See https://github.com/ppggff/vagrant-qemu for the plugin used here.
+VAGRANT_PROVIDER = 'qemu'.freeze
+
+# QEMU box (overridden by `make vm`).
+QEMU_BOX = 'perk/ubuntu-2204-arm64'.freeze
+
+# Pick guest CPU architecture from the box name unless QEMU_ARCH is set explicitly.
+# arm64 / aarch64 in the box slug → aarch64; everything else → x86_64.
+QEMU_ARCH = ENV.fetch(
+  'QEMU_ARCH',
+  QEMU_BOX.match?(/(arm64|aarch64)/i) ? 'aarch64' : 'x86_64'
+).freeze
+QEMU_CPUS = Integer(ENV.fetch('QEMU_CPUS', '2'))
+QEMU_MEMORY = Integer(ENV.fetch('QEMU_MEMORY', '4096'))
+SSH_HOST_PORT = Integer(ENV.fetch('SSH_HOST_PORT', '0')) # 0 lets Vagrant pick a free port
+
+Vagrant.configure(2) do |config|
+  config.vm.box = QEMU_BOX
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.hostname = MACHINE_NAME
+
+  # vagrant-qemu uses user-mode networking; expose SSH via a forwarded port.
+  if SSH_HOST_PORT > 0
+    config.vm.network 'forwarded_port', guest: 22, host: SSH_HOST_PORT, id: 'ssh', auto_correct: true
+  end
+
+  config.vm.provider 'qemu' do |qe|
+    qe.arch = QEMU_ARCH
+    qe.cpus = QEMU_CPUS
+    qe.memory = "#{QEMU_MEMORY}M"
+    qe.net_device = 'virtio-net-pci'
+
+    if QEMU_ARCH == 'aarch64'
+      # Native on Apple Silicon → use Hypervisor.framework acceleration.
+      qe.machine = 'virt,accel=hvf,highmem=on'
+      qe.cpu = 'host'
+      qe.smp = "cpus=#{QEMU_CPUS},sockets=1,cores=#{QEMU_CPUS},threads=1"
+    else
+      # x86_64 on Apple Silicon runs under TCG emulation (slow, but works for testing).
+      qe.machine = 'q35'
+      qe.cpu = 'qemu64'
+      qe.smp = "cpus=#{QEMU_CPUS},sockets=1,cores=#{QEMU_CPUS},threads=1"
+    end
+  end
+
+  if CONFIG_ENGINE == 'ansible'
+    config.vm.provision 'ansible' do |ansible|
+      ansible.playbook = "ansible/#{ANSIBLE_PLAYBOOK}/#{ANSIBLE_ROLE}/#{ANSIBLE_SETUP_FILE}"
+    end
+  else
+    config.vm.provision 'shell', inline: <<-SHELL
+      sudo dnf upgrade -y
+    SHELL
+  end
+end
