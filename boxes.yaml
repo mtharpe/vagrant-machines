@@ -1,0 +1,61 @@
+# OS catalog. Each entry maps a friendly OS id to:
+#   family:   apt | rpm  (used to pick the ansible playbook)
+#   ansible:  the playbook directory under provisioners/ansible/ansible-<ansible>-base/
+#   boxes:    box name per provider
+#
+# Provider keys:
+#   virtualbox      Linux x86_64, Intel Mac, Windows
+#   libvirt         Linux (KVM)
+#   qemu            Apple Silicon (sparse ecosystem; many "qemu" boxes are mislabeled libvirt)
+#   parallels       Apple Silicon (paid)
+#   utm             Apple Silicon via vagrant_utm plugin (custom box URLs)
+#
+# When the box for your platform is empty, install one yourself with:
+#   make box-add box=publisher/name           (uses host default provider)
+#   make box-add box=publisher/name provider=qemu
+
+ubuntu22:
+  family: apt
+  ansible: ubuntu
+  boxes:
+    virtualbox:     bento/ubuntu-22.04
+    libvirt:        generic/ubuntu2204
+    qemu:           # vagrant-qemu boxes for 22.04 are mislabeled — fill in once verified
+
+ubuntu24:
+  family: apt
+  ansible: ubuntu
+  boxes:
+    virtualbox:     bento/ubuntu-24.04
+    libvirt:        generic/ubuntu2404
+    qemu:           # ditto
+
+# Ubuntu 26.04 LTS released April 2026; not yet packaged by the publishers we use.
+# Re-add once bento/perk/gyptazy publish a 26.04 box.
+# ubuntu26:
+#   family: apt
+#   ansible: ubuntu
+
+rocky9:
+  family: rpm
+  ansible: centos
+  boxes:
+    virtualbox:     bento/rockylinux-9
+    libvirt:        generic/rocky9
+    qemu:
+
+rocky10:
+  family: rpm
+  ansible: centos
+  boxes:
+    virtualbox:     bento/rockylinux-10.0
+    libvirt:        generic/rocky10
+    qemu:
+
+fedora42:
+  family: rpm
+  ansible: fedora
+  boxes:
+    virtualbox:     bento/fedora-42
+    libvirt:        generic/fedora42
+    qemu:
