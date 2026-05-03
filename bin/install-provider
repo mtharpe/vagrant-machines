@@ -127,6 +127,51 @@ install_plugin() {
   fi
 }
 
+# Install shell completion for the current $SHELL. Idempotent.
+install_shell_completion() {
+  local shell_name shell_path
+  shell_path="${SHELL:-$(getent passwd "$USER" 2>/dev/null | cut -d: -f7)}"
+  shell_name="$(basename "${shell_path:-bash}")"
+
+  case "$shell_name" in
+    fish)
+      local target="${XDG_CONFIG_HOME:-$HOME/.config}/fish/conf.d/vagrant-machines.fish"
+      local source="$REPO_ROOT/completions/vagrant-machines.fish"
+      if [ -L "$target" ] && [ "$(readlink "$target")" = "$source" ]; then
+        info "fish completion already installed at $target"
+        return
+      fi
+      confirm "Install fish completion (symlink $target -> $source)?" || { info "skipped completion install"; return; }
+      run mkdir -p "$(dirname "$target")"
+      [ -e "$target" ] && run mv "$target" "$target.bak.$(date +%s)"
+      run ln -s "$source" "$target"
+      info "fish completion installed; open a new fish shell or 'exec fish' to load it."
+      ;;
+    bash)
+      local rc="$HOME/.bashrc"
+      [ "$(uname -s)" = "Darwin" ] && [ -f "$HOME/.bash_profile" ] && rc="$HOME/.bash_profile"
+      local line="source $REPO_ROOT/completions/vagrant-machines.bash  # vagrant-machines completion"
+      if grep -Fq "$REPO_ROOT/completions/vagrant-machines.bash" "$rc" 2>/dev/null; then
+        info "bash completion already sourced from $rc"
+        return
+      fi
+      confirm "Append completion source line to $rc?" || { info "skipped completion install"; return; }
+      printf '\n%s\n' "$line" >> "$rc"
+      info "bash completion installed; run 'source $rc' or open a new shell to load it."
+      ;;
+    zsh)
+      info "zsh detected. The bash completion script works in zsh via bashcompinit."
+      info "Add this to ~/.zshrc:"
+      info "  autoload -U +X bashcompinit && bashcompinit"
+      info "  source $REPO_ROOT/completions/vagrant-machines.bash"
+      ;;
+    *)
+      info "Unsupported shell '$shell_name' for auto-completion install."
+      info "See $REPO_ROOT/completions/ for the available completion scripts."
+      ;;
+  esac
+}
+
 info "Host:     $(host_platform)"
 info "Provider: $provider"
 echo
@@ -143,6 +188,11 @@ case "$(host_platform)::$provider" in
   linux-*::qemu)                die "Use libvirt on Linux instead of qemu (libvirt wraps qemu and has full Vagrant support)." ;;
   *)                            die "no installer recipe for $(host_platform) + $provider — install manually" ;;
 esac
+
+echo
+info "Provider install complete. Now installing shell completion..."
+echo
+install_shell_completion
 
 echo
 info "Done. Run 'make doctor' to verify."
