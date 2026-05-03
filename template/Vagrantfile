@@ -1,0 +1,81 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+#
+# Provider-agnostic template. Reads .vmconfig (written by bin/new-machine).
+
+require 'pathname'
+
+CONFIG_PATH = Pathname.new(__dir__).join('.vmconfig').freeze
+abort "missing #{CONFIG_PATH} (was this dir created via bin/new-machine?)" unless CONFIG_PATH.file?
+
+cfg = {}
+CONFIG_PATH.each_line do |line|
+  line = line.strip
+  next if line.empty? || line.start_with?('#')
+  k, v = line.split('=', 2)
+  cfg[k] = v
+end
+
+MACHINE_NAME       = cfg.fetch('MACHINE_NAME')
+VAGRANT_BOX        = cfg.fetch('VAGRANT_BOX')
+VAGRANT_PROVIDER   = cfg.fetch('VAGRANT_PROVIDER')
+ANSIBLE_PLAYBOOK   = cfg.fetch('ANSIBLE_PLAYBOOK')
+ANSIBLE_ROLE       = cfg.fetch('ANSIBLE_ROLE')
+ANSIBLE_SETUP_FILE = cfg.fetch('ANSIBLE_SETUP_FILE')
+
+CPUS    = Integer(ENV.fetch('VM_CPUS', '2'))
+MEMORY  = Integer(ENV.fetch('VM_MEMORY', '4096'))
+
+Vagrant.configure(2) do |config|
+  config.vm.box = VAGRANT_BOX
+  config.vm.hostname = MACHINE_NAME
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+
+  case VAGRANT_PROVIDER
+  when 'virtualbox'
+    config.vm.network :private_network, type: 'dhcp'
+    config.vm.provider 'virtualbox' do |v|
+      v.gui = false
+      v.name = MACHINE_NAME
+      v.cpus = CPUS
+      v.memory = MEMORY
+    end
+  when 'libvirt'
+    config.vm.provider 'libvirt' do |v|
+      v.uri = 'qemu:///session'
+      v.qemu_use_session = true
+      v.cpus = CPUS
+      v.memory = MEMORY
+    end
+  when 'qemu'
+    arch = VAGRANT_BOX.match?(/(arm64|aarch64)/i) ? 'aarch64' : 'x86_64'
+    ssh_port = Integer(ENV.fetch('SSH_HOST_PORT', '0'))
+    config.vm.network 'forwarded_port', guest: 22, host: ssh_port, id: 'ssh', auto_correct: true if ssh_port > 0
+    config.vm.provider 'qemu' do |qe|
+      qe.arch = arch
+      qe.cpus = CPUS
+      qe.memory = "#{MEMORY}M"
+      qe.net_device = 'virtio-net-pci'
+      if arch == 'aarch64'
+        qe.machine = 'virt,accel=hvf,highmem=on'
+        qe.cpu = 'host'
+      else
+        qe.machine = 'q35'
+        qe.cpu = 'qemu64'
+      end
+      qe.smp = "cpus=#{CPUS},sockets=1,cores=#{CPUS},threads=1"
+    end
+  when 'parallels'
+    config.vm.provider 'parallels' do |v|
+      v.cpus = CPUS
+      v.memory = MEMORY
+    end
+  else
+    abort "unsupported provider: #{VAGRANT_PROVIDER}"
+  end
+
+  config.vm.provision 'ansible_local' do |a|
+    a.playbook = "ansible/#{ANSIBLE_PLAYBOOK}/#{ANSIBLE_ROLE}/#{ANSIBLE_SETUP_FILE}"
+    a.compatibility_mode = '2.0'
+  end
+end
