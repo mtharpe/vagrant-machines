@@ -1,0 +1,46 @@
+---
+# VS Code (Microsoft) ---------------------------------------------------------
+- name: Import Microsoft signing key
+  ansible.builtin.rpm_key:
+    key: https://packages.microsoft.com/keys/microsoft.asc
+    state: present
+
+- name: Add VS Code yum repo
+  ansible.builtin.yum_repository:
+    name: vscode
+    description: VS Code (Microsoft)
+    baseurl: https://packages.microsoft.com/yumrepos/vscode
+    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+    gpgcheck: true
+    enabled: true
+
+# Azure CLI -------------------------------------------------------------------
+- name: Add Azure CLI yum repo
+  ansible.builtin.yum_repository:
+    name: azure-cli
+    description: Azure CLI
+    baseurl: https://packages.microsoft.com/yumrepos/azure-cli
+    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+    gpgcheck: true
+    enabled: true
+
+# Docker CE -------------------------------------------------------------------
+# Same upstream repo file works for Fedora and the RHEL/Rocky/CentOS family,
+# selected by the distro path below.
+- name: Set Docker repo URL
+  ansible.builtin.set_fact:
+    docker_repo_url: >-
+      {{ 'https://download.docker.com/linux/fedora/docker-ce.repo'
+         if ansible_distribution == 'Fedora'
+         else 'https://download.docker.com/linux/centos/docker-ce.repo' }}
+
+- name: Install Docker CE repo file
+  ansible.builtin.get_url:
+    url: "{{ docker_repo_url }}"
+    dest: /etc/yum.repos.d/docker-ce.repo
+    mode: '0644'
+    force: false
+
+- name: Refresh package facts after repo changes
+  ansible.builtin.package_facts:
+    manager: auto

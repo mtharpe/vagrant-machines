@@ -1,9 +1,0 @@
----
-- name: Setup Workstation
-  hosts: all
-  become: true
-  gather_facts: true
-
-  tasks:
-    - name: Include main tasks
-      ansible.builtin.include_tasks: tasks/main.yml

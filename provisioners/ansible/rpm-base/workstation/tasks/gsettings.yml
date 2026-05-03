@@ -1,0 +1,15 @@
+---
+- name: Set GNOME interface preferences
+  community.general.dconf:
+    key: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+  become: true
+  become_user: "{{ workstation_user }}"
+  loop:
+    - { key: "/org/gnome/desktop/interface/gtk-theme",          value: "'Adwaita-dark'" }
+    - { key: "/org/gnome/desktop/interface/clock-format",       value: "'12h'" }
+    - { key: "/org/gnome/desktop/interface/enable-animations",  value: "false" }
+    - { key: "/org/gnome/desktop/wm/preferences/button-layout", value: "':minimize,maximize,close'" }
+  loop_control:
+    label: "{{ item.key }}"

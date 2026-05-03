@@ -1,0 +1,27 @@
+---
+# HashiCorp APT repo. Uses the modern signed-by pattern (apt_key is deprecated
+# in Ansible 2.14+). The keyring is dropped under /etc/apt/keyrings so apt
+# can verify the repo signature without touching the system trust store.
+
+- name: Ensure /etc/apt/keyrings exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Fetch HashiCorp signing key
+  ansible.builtin.get_url:
+    url: https://apt.releases.hashicorp.com/gpg
+    dest: /etc/apt/keyrings/hashicorp-archive-keyring.asc
+    mode: '0644'
+    force: false
+
+- name: Add HashiCorp APT repo
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [arch={{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}
+      signed-by=/etc/apt/keyrings/hashicorp-archive-keyring.asc]
+      https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main
+    filename: hashicorp
+    state: present
+    update_cache: true

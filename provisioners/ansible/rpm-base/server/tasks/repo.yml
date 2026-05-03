@@ -1,0 +1,28 @@
+---
+# EPEL: only meaningful on RHEL/Rocky/Alma/Oracle (Fedora already has these
+# packages in main repos).
+- name: Enable EPEL on RHEL-family
+  ansible.builtin.dnf:
+    name: epel-release
+    state: present
+  when: ansible_distribution in ['Rocky', 'AlmaLinux', 'CentOS', 'OracleLinux', 'RedHat']
+
+# HashiCorp uses different paths for fedora vs RHEL-family.
+- name: Set HashiCorp repo URL
+  ansible.builtin.set_fact:
+    hashicorp_repo_url: >-
+      {{ 'https://rpm.releases.hashicorp.com/fedora/hashicorp.repo'
+         if ansible_distribution == 'Fedora'
+         else 'https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo' }}
+
+- name: Install HashiCorp repo file
+  ansible.builtin.get_url:
+    url: "{{ hashicorp_repo_url }}"
+    dest: /etc/yum.repos.d/hashicorp.repo
+    mode: '0644'
+    force: false
+
+- name: Import HashiCorp GPG key
+  ansible.builtin.rpm_key:
+    key: https://rpm.releases.hashicorp.com/gpg
+    state: present

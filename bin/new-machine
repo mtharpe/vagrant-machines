@@ -57,7 +57,7 @@ case "$role" in server|workstation) ;; *) die "role must be server or workstatio
 # resolve catalog
 box=$(catalog_box "$os" "$provider") || die "no box for $os on $provider — edit boxes.yaml or pass provider="
 ansible_dir=$(catalog_field "$os" ansible)
-playbook="ansible-${ansible_dir}-base"
+playbook="${ansible_dir}-base"
 setup_file="setup_${role}.yml"
 
 playbook_path="$REPO_ROOT/provisioners/ansible/$playbook/$role/$setup_file"

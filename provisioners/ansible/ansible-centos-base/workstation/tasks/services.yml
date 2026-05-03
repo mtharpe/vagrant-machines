@@ -1,6 +1,0 @@
----
-- name: Enable TLP
-  ansible.builtin.service:
-    name: tlp
-    enabled: true
-    state: started

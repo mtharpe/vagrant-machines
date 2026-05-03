@@ -1,0 +1,36 @@
+---
+- name: Base server setup (apt)
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Refuse to run on non-Debian-family hosts
+      ansible.builtin.fail:
+        msg: "apt-base playbook requires a Debian-family OS, got {{ ansible_os_family }}"
+      when: ansible_os_family != 'Debian'
+
+  tasks:
+    - name: Configure repositories
+      ansible.builtin.include_tasks: tasks/repo.yml
+
+    - name: Install common server packages
+      ansible.builtin.apt:
+        name:
+          - wget
+          - curl
+          - unzip
+          - tar
+          - tmux
+          - direnv
+          - git
+          - jq
+          - vim
+          - nmon
+          - terraform
+          - vault
+          - consul
+          - nomad
+        state: present
+        update_cache: true
+        cache_valid_time: 3600

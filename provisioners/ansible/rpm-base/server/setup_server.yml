@@ -1,0 +1,44 @@
+---
+- name: Base server setup (rpm)
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Refuse to run on non-RHEL-family hosts
+      ansible.builtin.fail:
+        msg: "rpm-base playbook requires a RedHat-family OS, got {{ ansible_os_family }}"
+      when: ansible_os_family != 'RedHat'
+
+  tasks:
+    - name: Configure repositories
+      ansible.builtin.include_tasks: tasks/repo.yml
+
+    - name: Install common server packages
+      ansible.builtin.dnf:
+        name:
+          - wget
+          - curl
+          - unzip
+          - tar
+          - tmux
+          - direnv
+          - git
+          - jq
+          - vim-enhanced
+          - terraform
+          - vault
+          - consul
+          - nomad
+        state: present
+
+    # nmon ships in EPEL on RHEL/Rocky; EPEL 10 coverage is incomplete at the
+    # time of writing, and Fedora has nmon in the main repo.
+    - name: Install nmon (best-effort)
+      ansible.builtin.dnf:
+        name: nmon
+        state: present
+      register: nmon_install
+      failed_when:
+        - nmon_install.failed
+        - "'No package' not in (nmon_install.msg | default(''))"

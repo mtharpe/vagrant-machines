@@ -18,7 +18,7 @@
 
 ubuntu22:
   family: apt
-  ansible: ubuntu
+  ansible: apt
   boxes:
     vmware_desktop: bento/ubuntu-22.04
     parallels:      bento/ubuntu-22.04
@@ -27,7 +27,7 @@ ubuntu22:
 
 ubuntu24:
   family: apt
-  ansible: ubuntu
+  ansible: apt
   boxes:
     vmware_desktop: bento/ubuntu-24.04
     parallels:      bento/ubuntu-24.04
@@ -38,11 +38,11 @@ ubuntu24:
 # Re-add once bento/ubuntu-26.04 ships.
 # ubuntu26:
 #   family: apt
-#   ansible: ubuntu
+#   ansible: apt
 
 rocky9:
   family: rpm
-  ansible: centos
+  ansible: rpm
   boxes:
     vmware_desktop: bento/rockylinux-9
     parallels:      bento/rockylinux-9
@@ -51,7 +51,7 @@ rocky9:
 
 rocky10:
   family: rpm
-  ansible: centos
+  ansible: rpm
   boxes:
     vmware_desktop: bento/rockylinux-10.0
     parallels:      bento/rockylinux-10.0
@@ -60,7 +60,7 @@ rocky10:
 
 fedora42:
   family: rpm
-  ansible: fedora
+  ansible: rpm
   boxes:
     vmware_desktop: bento/fedora-42
     parallels:      bento/fedora-42

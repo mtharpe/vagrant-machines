@@ -1,0 +1,54 @@
+---
+- name: Import server base
+  ansible.builtin.import_playbook: ../server/setup_server.yml
+
+- name: Workstation extras (rpm)
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars:
+    workstation_user: "{{ ansible_user | default('vagrant') }}"
+    arm64: "{{ ansible_architecture == 'aarch64' }}"
+
+  tasks:
+    - name: Configure workstation repositories
+      ansible.builtin.include_tasks: tasks/repo.yml
+
+    - name: Install workstation packages
+      ansible.builtin.dnf:
+        name:
+          - "@Development Tools"
+          - gnome-tweaks
+          - code
+          - azure-cli
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+
+    - name: Install Google Chrome (amd64 only)
+      ansible.builtin.dnf:
+        name: https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+        disable_gpg_check: true
+        state: present
+      when: not arm64
+
+    - name: Get current systemd default target
+      ansible.builtin.command: systemctl get-default
+      register: systemd_default
+      changed_when: false
+
+    - name: Enable graphical target
+      ansible.builtin.command: systemctl set-default graphical.target
+      when: systemd_default.stdout.strip() != 'graphical.target'
+      notify: Reboot reminder
+
+    - name: Apply GNOME settings (only if GNOME is present)
+      ansible.builtin.include_tasks: tasks/gsettings.yml
+      when: "'gnome-shell' in ansible_facts.packages | default({})"
+
+  handlers:
+    - name: Reboot reminder
+      ansible.builtin.debug:
+        msg: "graphical.target newly enabled — reboot to start GNOME"

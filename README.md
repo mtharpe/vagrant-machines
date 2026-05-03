@@ -64,6 +64,23 @@ emulating amd64. Fusion's installer must be downloaded manually from
 disabled in 2025-06 because the download requires authentication). Parallels
 is a paid alternative installable via `brew install --cask parallels`.
 
+## Tab completion
+
+The repo ships completion scripts under `completions/` that complete:
+target names (`make up<TAB>`), VM names (`name=<TAB>` lists `.machines/*`),
+OS ids (`os=<TAB>` reads `boxes.yaml`), and roles/providers/archs.
+
+```sh
+# fish
+echo "source $PWD/completions/vagrant-machines.fish" >> ~/.config/fish/config.fish
+
+# bash
+echo "source $PWD/completions/vagrant-machines.bash" >> ~/.bashrc
+```
+
+The completions only kick in when `make` is invoked from within this repo
+tree, so they don't interfere with `make` in other projects.
+
 ## Adding an OS
 
 Edit `boxes.yaml`:
