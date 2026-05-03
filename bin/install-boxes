@@ -8,11 +8,13 @@ info "Installing boxes for provider: $provider"
 echo
 
 failed=()
+skipped=()
 while IFS= read -r os_id; do
-  box=$(catalog_box "$os_id" "$provider" 2>/dev/null) || {
-    info "skip $os_id (no $provider box defined)"
+  if ! box=$(catalog_box "$os_id" "$provider" 2>/dev/null); then
+    skipped+=("$os_id")
+    info "skip $os_id  (no $provider box in boxes.yaml)"
     continue
-  }
+  fi
   printf '\n--- %s (%s) ---\n' "$os_id" "$box"
   if ! vagrant box add "$box" --provider="$provider" --force; then
     failed+=("$os_id ($box)")

@@ -43,8 +43,9 @@ with open(os.path.join(os.environ['REPO_ROOT'], 'boxes.yaml')) as f:
 PY
 }
 
-# Resolve an OS id + provider to a box name.
-# Usage: catalog_box ubuntu24 vmware_desktop
+# Resolve an OS id + provider to a box name. Exits non-zero (with a stderr
+# message) if the entry is absent or blank.
+# Usage: catalog_box ubuntu24 virtualbox
 catalog_box() {
   python3 - "$1" "$2" <<'PY'
 import os, sys, yaml
@@ -54,9 +55,10 @@ with open(os.path.join(os.environ['REPO_ROOT'], 'boxes.yaml')) as f:
 if os_id not in cat:
     sys.exit(f"unknown os id: {os_id}")
 boxes = cat[os_id].get('boxes') or {}
-if provider not in boxes:
+box = boxes.get(provider)
+if not box:
     sys.exit(f"no box defined for {os_id} on provider {provider}")
-print(boxes[provider])
+print(box)
 PY
 }
 
