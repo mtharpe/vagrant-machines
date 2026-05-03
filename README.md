@@ -1,123 +1,84 @@
 ![Vagrant Validation](https://github.com/mtharpe/vagrant-machines/workflows/Vagrant%20Validation/badge.svg)
 
+# vagrant-machines
 
-# The Vagrant Machines Repo
+One-command Vagrant VMs that work the same on macOS and Linux. The host
+platform picks a sensible Vagrant provider; you pick an OS from a short
+catalog (`boxes.yaml`) and the rest is wired up automatically — including
+the right Ansible playbook for the OS family.
 
-Vagrant is a tool for building and managing virtual machine environments in a single workflow. With an easy-to-use workflow and focus on automation, Vagrant lowers development environment setup time, increases production parity, and makes the "works on my machine" excuse a relic of the past.
-
-## Installing
-
-You will need to install some things before you can use the Vagrant machines in this repo. The software can be installed via package manager or standalone installs, but must be functional before these will work.
-
-- Vagrant
-- VirtualBox
-
-Next, you can use the `Makefile` included in the repo to install, update, validate, and prune the machines.
-
-Boxes can come from any publisher namespace (for example `bento/*`, `generic/*`, `gnome-shell-box/*`).
-
-Example:
+## Layout
 
 ```
-make plugins
-make install
-make update
-make validate
-make clean
-make vm
+.
+├── Makefile             Thin entry point. All targets call into bin/.
+├── bin/
+│   ├── doctor           Check prereqs and print install hints
+│   ├── install-boxes    Install every box in boxes.yaml for your provider
+│   └── new-machine      Create a new VM dir from template/
+├── boxes.yaml           OS catalog (single source of truth for box names)
+├── template/            Per-VM scaffold (Vagrantfile + Makefile)
+├── provisioners/ansible Reusable Ansible playbooks (ubuntu / centos / fedora)
+└── .machines/           Where created VMs live (gitignored)
 ```
 
-## Creating a VM
+## Usage
 
-The `vm` target supports both interactive and non-interactive use.
+```sh
+make doctor                         # check prereqs for your platform
+make install                        # install default boxes for your provider
 
-### Interactive
+make new                            # interactive: pick OS, name, role
+make new name=web1 os=ubuntu24 role=server
 
-Run `make vm` and provide prompted values:
-
-- VM name
-- Installed Vagrant box
-- Provider (`virtualbox`, `libvirt`, or `vmware_desktop`)
-- Role (`server` or `workstation`)
-- Package family (`apt` or `rpm`) when it cannot be inferred from the box name
-
-If the selected box already exists locally for a specific provider, `make vm` will auto-select that provider (or prompt from installed providers) to avoid provider mismatch errors.
-
-### Non-interactive
-
-You can provide variables directly:
-
-```
-make vm name=<machine-name> box=<installed-box-name> role=<server|workstation> family=<apt|rpm>
+make up name=web1                   # start
+make ssh name=web1
+make halt name=web1
+make destroy name=web1
+make list                           # show every machine under .machines/
 ```
 
-Optional override:
+Override the auto-detected provider:
 
-```
-make vm name=<machine-name> box=<installed-box-name> role=<server|workstation> family=<apt|rpm> playbook=<ansible-*-base> provider=<virtualbox|libvirt|vmware_desktop>
-```
-
-By default, `vm` rewrites the generated `Vagrantfile` to set:
-
-- `config.vm.box`
-- `ANSIBLE_PLAYBOOK`
-- `ANSIBLE_ROLE`
-- `ANSIBLE_SETUP_FILE`
-- `VAGRANT_PROVIDER`
-
-and validates that the selected playbook path exists under `provisioners/ansible`.
-
-If you choose a provider that is not installed for the selected box, `make vm` now fails early with a suggested `make box-add ...` command.
-
-Generated VMs are created under `./.machines/<machine-name>` by default. This directory is ignored by Git so personal/local machine definitions are not committed.
-
-You can view or override this location:
-
-```
-make vm-root
-make vm vm_root=.machines-lab name=<machine-name> box=<installed-box-name> role=<server|workstation> family=<apt|rpm>
+```sh
+make new name=db1 os=rocky10 provider=virtualbox
+VAGRANT_DEFAULT_PROVIDER=libvirt make install
 ```
 
-### Migration note (existing root-level VMs)
+## Provider defaults
 
-If you created VM directories at the repository root before this change, move them into `.machines/`.
+| Host                | Default provider | Notes                                              |
+|---------------------|------------------|----------------------------------------------------|
+| Apple Silicon (Mac) | `qemu`           | Sparse box ecosystem; see note below.              |
+| Intel Mac           | `virtualbox`     |                                                    |
+| Linux (libvirtd)    | `libvirt`        | Auto-detected via `virsh`.                         |
+| Linux (no libvirt)  | `virtualbox`     |                                                    |
 
-One at a time with Make:
+**Apple Silicon caveat:** `vagrant-qemu` works, but most Vagrant publishers
+either don't ship qemu boxes or mislabel libvirt boxes as qemu. The catalog
+ships with `qemu:` entries blank — fill them in once you find or build a
+working box for each OS. Alternatives if qemu doesn't pan out: `parallels`
+(paid) or `utm` via the `vagrant_utm` plugin.
 
-```
-make vm-migrate name=<machine-name>
-```
+## Adding an OS
 
-Example (replace names with your VM directories):
+Edit `boxes.yaml`:
 
-```
-mkdir -p .machines
-mv my-old-vm another-old-vm .machines/
-```
-
-Then run Vagrant from the new location:
-
-```
-cd .machines/my-old-vm
-vagrant status
-```
-
-## Examples
-
-```
-$ make vm
-# prompts for name/box/role/family
-
-$ make vm name=rocky-server box=bento/rockylinux-9 role=server family=rpm
-$ make vm name=ubuntu-workstation box=bento/ubuntu-24.04 role=workstation family=apt
-
-$ cd .machines/rocky-server
-$ vagrant up
-
-$ cd .machines/ubuntu-workstation
-$ vagrant up
+```yaml
+debian12:
+  family: apt
+  ansible: ubuntu          # closest matching playbook dir under provisioners/ansible
+  boxes:
+    virtualbox: bento/debian-12
+    libvirt:    generic/debian12
+    qemu:                  # leave blank if no qemu box yet
 ```
 
-After running the commands above, you will have a fully running virtual machine in VirtualBox.
+Then `make new name=foo os=debian12`. No code changes required.
 
-You can SSH into this machine with `vagrant ssh`, and when you are done playing around, you can terminate the virtual machine with `vagrant destroy`.
+## Migrating from the old layout
+
+The old per-platform split, the giant inline `vm:` Make target, and the
+top-level `template-vm/` are gone. Existing VMs you've already created under
+`.machines/` keep their own Vagrantfile and aren't touched — they continue to
+work via `cd .machines/<name> && vagrant up`.

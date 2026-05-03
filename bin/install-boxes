@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Install every box in boxes.yaml that has an entry for this host's provider.
+set -euo pipefail
+. "$(dirname "$0")/_lib.sh"
+
+provider=$(default_provider)
+info "Installing boxes for provider: $provider"
+echo
+
+failed=()
+while IFS= read -r os_id; do
+  box=$(catalog_box "$os_id" "$provider" 2>/dev/null) || {
+    info "skip $os_id (no $provider box defined)"
+    continue
+  }
+  printf '\n--- %s (%s) ---\n' "$os_id" "$box"
+  if ! vagrant box add "$box" --provider="$provider" --force; then
+    failed+=("$os_id ($box)")
+  fi
+done < <(list_os_ids)
+
+echo
+if [ ${#failed[@]} -gt 0 ]; then
+  info "Failed:"
+  for f in "${failed[@]}"; do info "  - $f"; done
+  exit 1
+fi
+info "All boxes installed."
