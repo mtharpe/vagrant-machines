@@ -1,4 +1,4 @@
-![Vagrant Validation](https://github.com/mtharpe/vagrant-machines/workflows/Vagrant%20Validation/badge.svg)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/mtharpe/vagrant-machines/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/mtharpe/vagrant-machines/tree/main)
 
 # vagrant-machines
 
