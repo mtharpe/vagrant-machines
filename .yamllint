@@ -1,0 +1,16 @@
+---
+extends: default
+
+rules:
+  # boxes.yaml deliberately column-aligns provider values; long bento/generic
+  # box names also push past 80 chars. URLs in comments do too.
+  line-length: disable
+  colons:
+    max-spaces-after: -1
+  # ansible task loops use column-aligned flow mappings: { key: ..., value: ... }
+  braces:
+    max-spaces-inside: -1
+  commas:
+    max-spaces-after: -1
+  # `---` headers are optional in our role files
+  document-start: disable

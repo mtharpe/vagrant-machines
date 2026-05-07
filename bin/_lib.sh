@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Shared helpers. Sourced by bin/* scripts.
 
 REPO_ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")/.." && pwd)
